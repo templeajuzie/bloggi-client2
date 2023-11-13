@@ -1,33 +1,32 @@
 import Link from "next/link";
-import logo from "../../Resources/Images/bloggilogo.png"
+import logo from "../../Resources/Images/bloggilogo.png";
 import Image from "next/image";
 
 function Footer() {
   return (
     <footer className="bg-gray-100">
-      <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
+      <div className="max-w-5xl px-4 py-16 mx-auto sm:px-6 lg:px-8">
         <div className="flex justify-center text-teal-600">
-        <Link
-                className='text-teal-600 flex flex-row items-center gap-2'
-                href='/'>
-               
-                <Image
-                  className='h-[55px] w-auto object-cover '
-                  src={logo}
-                  height={200}
-                  width={200}
-                  alt=""
-                  />
-                
-              </Link>
+          <Link
+            className="flex flex-row items-center gap-2 text-teal-600"
+            href="/"
+          >
+            <Image
+              className="h-[55px] w-auto object-cover "
+              src={logo}
+              height={200}
+              width={200}
+              alt=""
+            />
+          </Link>
         </div>
 
-        <p className="mx-auto mt-6 max-w-md text-center leading-relaxed text-gray-500">
+        <p className="max-w-md mx-auto mt-6 leading-relaxed text-center text-gray-500">
           Lorem ipsum dolor, sit amet consectetur adipisicing elit. Incidunt
           consequuntur amet culpa cum itaque neque.
         </p>
 
-        <ul className="mt-12 flex flex-wrap justify-center gap-6 md:gap-8 lg:gap-12">
+        <ul className="flex flex-wrap justify-center gap-6 mt-12 md:gap-8 lg:gap-12">
           <li>
             <a
               className="text-gray-700 transition hover:text-gray-700/75"
@@ -73,17 +72,10 @@ function Footer() {
             </a>
           </li>
 
-          <li>
-            <a
-              className="text-gray-700 transition hover:text-gray-700/75"
-              href="/"
-            >
-              Blog
-            </a>
-          </li>
+          
         </ul>
 
-        <ul className="mt-12 flex justify-center gap-6 md:gap-8">
+        <ul className="flex justify-center gap-6 mt-12 md:gap-8">
           <li>
             <a
               href="/"
@@ -93,7 +85,7 @@ function Footer() {
             >
               <span className="sr-only">Facebook</span>
               <svg
-                className="h-6 w-6"
+                className="w-6 h-6"
                 fill="currentColor"
                 viewBox="0 0 24 24"
                 aria-hidden="true"
@@ -116,7 +108,7 @@ function Footer() {
             >
               <span className="sr-only">Instagram</span>
               <svg
-                className="h-6 w-6"
+                className="w-6 h-6"
                 fill="currentColor"
                 viewBox="0 0 24 24"
                 aria-hidden="true"
@@ -139,7 +131,7 @@ function Footer() {
             >
               <span className="sr-only">Twitter</span>
               <svg
-                className="h-6 w-6"
+                className="w-6 h-6"
                 fill="currentColor"
                 viewBox="0 0 24 24"
                 aria-hidden="true"
@@ -158,7 +150,7 @@ function Footer() {
             >
               <span className="sr-only">GitHub</span>
               <svg
-                className="h-6 w-6"
+                className="w-6 h-6"
                 fill="currentColor"
                 viewBox="0 0 24 24"
                 aria-hidden="true"
@@ -181,7 +173,7 @@ function Footer() {
             >
               <span className="sr-only">Dribbble</span>
               <svg
-                className="h-6 w-6"
+                className="w-6 h-6"
                 fill="currentColor"
                 viewBox="0 0 24 24"
                 aria-hidden="true"

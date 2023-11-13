@@ -63,7 +63,9 @@ const Navbar = () => {
 
       Cookies.remove("authtoken")
       window.location.reload();
-    } catch (error) { }
+    } catch (error) { 
+      
+    }
   }
 
   const SignOutAccount = async () => {
@@ -154,7 +156,7 @@ const Navbar = () => {
             </div>
 
             <div className='flex items-center gap-4'>
-              {loading ? <CircularProgress /> : error && (
+              {loading && !user ?  <CircularProgress /> : error && (
                 <div className='sm:flex sm:gap-4'>
                   <Link
                     className='rounded-md bg-[#FF3131] px-5 py-2.5 text-sm font-medium text-white shadow'

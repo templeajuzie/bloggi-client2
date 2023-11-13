@@ -12,6 +12,7 @@ import ReactiveButton from 'reactive-button';
 import Dashboard from '../../Components/Dashboard/Dashboard';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import Image from 'next/image';
 
 function EditBlog() {
   const params = useParams();
@@ -23,35 +24,53 @@ function EditBlog() {
   );
 
   const [state, setState] = useState('idle');
-  const authToken = useSelector((state) => state.authslice.authToken);
+  const [loading, setLoading] = useState(true);
 
   var currentDate = new Date();
   var year = currentDate.getFullYear();
   var month = currentDate.getMonth() + 1; // Note: Month is zero-based, so we add 1
   var day = currentDate.getDate();
 
-  // Create a formatted string with the current date
-  const [blog, setBlog] = useState(null);
-  var formattedDate = year + '-' + month + '-' + day;
+
+  const [blogid, setBlogId] = useState(params.id)
+  const [selectedphoto, setSelectedPhoto] = useState(null)
+  const [title, setTitle] = useState("");
+  const [shortdescription, setShortDescription] = useState(null);
+  const [longdescription, setLongDescription] = useState(null);
+  const [category, setCategory] = useState(null);
+  const [blogimage, setBlogImage] = useState(null);
+
+
 
   useEffect(() => {
     dispatch({ type: 'userauth/getUserInformation' });
+
 
     const FetchData = async () => {
 
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/v1/blog/${params.id}`
-        );
-
+          `http://localhost:8000/api/v1/blog/edit/${params.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${String(token)}`,
+            },
+          }
+        )
 
         if (response.status === 200) {
-          // setBlog(response.data.data);
-          console.log('data', blog);
+          const data = response.data.oldblog;
+
+          setLoading(false)
+
+          setTitle(data.title)
+          setShortDescription(data.shortdescription)
+          setLongDescription(data.longdescription)
+          setCategory(data.category)
+          setSelectedPhoto(data.blogimage)
         }
 
-        setBlog(response.data.data);
-        console.log(response.data.data);
+
       } catch (error) {
         console.log(error);
       }
@@ -61,13 +80,6 @@ function EditBlog() {
 
   }, []);
 
-
-
-  const [title, setTitle] = useState(null);
-  const [shortdescription, setShortDescription] = useState(null);
-  const [longdescription, setLongDescription] = useState(null);
-  const [category, setCategory] = useState(null);
-  const [blogimage, setBlogImage] = useState(null);
 
 
 
@@ -80,38 +92,45 @@ function EditBlog() {
   const dispatch = useDispatch();
 
 
-
+  const handleImageChange = (e) => {
+    const selectedFile = e.target.files[0];
+    setBlogImage(selectedFile);
+    const imageUrl = URL.createObjectURL(selectedFile);
+    setSelectedPhoto(imageUrl)
+  };
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const formData = new FormData()
+    formData.append("title", title)
+    formData.append("shortdescription", shortdescription)
+    formData.append("longdescription", longdescription)
+    formData.append("category", category)
+    formData.append("blogimage", blogimage)
+    formData.append("blogid", blogid)
+
+
     try {
       setState('loading');
-      const response = await axios.post(
-        'http://localhost:8000/api/v1/blog/create',
-        {
-          title: title,
-          shortdescription: shortdescription,
-          longdescription: longdescription,
-          category: category,
-          blogimage: blogimage,
-        },
+      const response = await axios.patch(
+        `http://localhost:8000/api/v1/blog/update/`,
+        formData,
         {
           headers: {
             Authorization: `Bearer ${String(token)}`,
           },
+          'Content-Type': 'multipart/form-data',
         }
       );
 
-      if (response.status !== 201) {
+      if (response.status !== 200) {
         setState('error');
       }
 
-      console.log(response.data.blogdata);
       setState('success');
 
-      console.log(post.data);
     } catch (error) {
       console.log(error);
     }
@@ -123,18 +142,19 @@ function EditBlog() {
       <div className='mx-auto bg-gray-50 px-4 py-16 sm:px-6'>
         <div className='max-w-lg mx-auto'>
           <h1 className='text-center text-2xl font-bold text-black sm:text-3xl'>
-            Edit your blog
+            Edit your post
           </h1>
 
           <p className='text-center text-gray-700 text-sm mt-5 font-medium'>
             Tweak, your blog, your audience are waiting...
           </p>
 
-          {blog === null ? (<>
+          {loading === true ? (<>
             loading...</>) : (<>
               <form
-                className='mb-6 mt-6 space-y-4 rounded-lg p-6 shadow-lg sm:p-8 lg:p-8'
+                className='mb-6 mt-6 space-y-4 rounded-lg py-6 px-2 md:p-6 shadow-lg sm:p-8 lg:p-8'
                 onSubmit={handleSubmit}
+                encType="multipart/form-data"
               >
                 <div>
                   <label htmlFor='title' className='sr-only'>
@@ -164,48 +184,53 @@ function EditBlog() {
                   <fieldset className='border border-gray-300 rounded-lg w-full'>
                     <select
                       name='blog-category'
+                      value={category}
                       className='block w-full rounded-md border-gray-300 shadow-sm py-4 px-3 text-sm text-gray-700'
                       onChange={(e) => setCategory(e.target.value)}
                     >
-                      <option value='technology'>Uncategorized</option>
-                      <option value='lifestyle'>Lifestyle</option>
+                      <option value='uncategorized'>Uncategorized</option>
+                      <option value='technology'>Technology</option>
                       <option value='travel'>Travel</option>
-                      <option value='food'>Food</option>
+                      <option value='lifestyle'>Lifestyle</option>
+                      <option value='food-cuisine'>Food & Cuisine</option>
+                      <option value='health-wellness'>Health & Wellness</option>
                       <option value='fashion'>Fashion</option>
+                      <option value='entertainment'>Entertainment</option>
+                      <option value='personal-development'>Personal Development</option>
+                      <option value='finance'>Finance</option>
+                      <option value='education'>Education</option>
+                      <option value='sports'>Sports</option>
+                      <option value='business'>Business</option>
+                      <option value='marketing'>Marketing</option>
+                      <option value='arts-culture'>Arts & Culture</option>
+                      <option value='environment'>Environment</option>
+                      <option value='agriculture'>Agriculture</option>
+                      <option value='politics'>Politics</option>
+                      <option value='science'>Science</option>
+                      <option value='food-drink'>Food & Drink</option>
+                      <option value='music'>Music</option>
+                      <option value='technology-gadgets'>Technology Gadgets</option>
+                      <option value='history'>History</option>
+                      <option value='travel-guides'>Travel Guides</option>
+                      <option value='family-parenting'>Family & Parenting</option>
+                      <option value='career'>Career</option>
+                      <option value='philosophy'>Philosophy</option>
+                      <option value='religion-spirituality'>Religion & Spirituality</option>
                     </select>
                   </fieldset>
                 </div>
-                {/* <div>
-              <label htmlFor='file_input' className='block mb-2 text-sm font-medium text-gray-900'>
-                Upload file
-              </label>
-              <input
-                className='block w-full text-sm text-gray-900 border border-gray-200 rounded-lg cursor-pointer bg-gray-100 focus:outline-none placeholder-gray-400 shadow-md'
-                aria-describedby='file_input_help'
-                id='file_input'
-                type='file'
-              />
-              <p className='mt-1 text-xs text-gray-700' id='file_input_help'>
-                SVG, PNG, JPG, or GIF (Max. 800x400px).
-              </p>
-            </div> */}
 
-                <div className="flex items-center justify-center w-full">
-                  <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <svg className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
-                      </svg>
-                      <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                        <span className="font-semibold">Click to upload</span> or drag and drop
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        SVG, PNG, JPG or GIF (MAX. 800x400px)
-                      </p>
-                    </div>
-                    <input id="dropzone-file" type="file" className="hidden" />
-                  </label>
+                <div className="mx-auto w-full">
+                  <label for="example1" className="mb-1 block text-sm font-medium text-gray-700">Update post image</label>
+                  <input id="example1" name="blogimage" onChange={handleImageChange} type="file" className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-black file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-60" accept='image/*' />
                 </div>
+
+
+                {selectedphoto &&
+                  <div className=''>
+                    <Image className='w-fill h-[50vh] object-cover rounded-lg' src={selectedphoto} height={500} width={500} alt='' />
+                  </div>
+                }
 
 
                 <div className='my-10 h-[50vh] pb-16 pt-6'>
@@ -223,8 +248,8 @@ function EditBlog() {
                   buttonState={state}
                   idleText="Publish"
                   loadingText="Loading"
-                  successText="Created successfully"
-                  errorText="Unable to Create"
+                  successText="Updated successfully"
+                  errorText="Unable to update"
                   color="red"
                   width='100%'
                   size="medium"
