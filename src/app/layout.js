@@ -1,4 +1,4 @@
-'use client'; // This is a client component 👈🏽
+
 
 import './globals.css';
 import { Inter } from 'next/font/google';
