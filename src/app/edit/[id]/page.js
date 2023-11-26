@@ -50,7 +50,7 @@ function EditBlog() {
 
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/v1/blog/edit/${params.id}`,
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/blog/edit/${params.id}`,
           {
             headers: {
               Authorization: `Bearer ${String(token)}`,
@@ -115,7 +115,7 @@ function EditBlog() {
     try {
       setState('loading');
       const response = await axios.patch(
-        `http://localhost:8000/api/v1/blog/update/`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/blog/update/`,
         formData,
         {
           headers: {
@@ -166,6 +166,7 @@ function EditBlog() {
                     className='w-full rounded-lg border border-gray-300 p-4 text-sm shadow-sm'
                     placeholder='Blog Title'
                     onChange={(e) => setTitle(e.target.value)}
+                    min={74}
                   />
                 </div>
                 <div>
@@ -176,6 +177,7 @@ function EditBlog() {
                     type='text'
                     value={shortdescription}
                     className='w-full rounded-lg border border-gray-300 p-4 text-sm shadow-sm'
+                    min={92}
                     placeholder='Short Description'
                     onChange={(e) => setShortDescription(e.target.value)}
                   />

@@ -1,33 +1,33 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { PiCrownBold } from 'react-icons/pi';
-import logo from '../../Resources/Images/bloggilogo.png';
-import Image from 'next/image';
+import Link from "next/link";
+import { PiCrownBold } from "react-icons/pi";
+import logo from "../../Resources/Images/bloggilogo.png";
+import Image from "next/image";
+import Swal from "sweetalert2";
 import {
   Menu,
   MenuHandler,
   MenuList,
   MenuItem,
-
 } from "@material-tailwind/react";
 
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { CircularProgress } from '@mui/material';
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { CircularProgress } from "@mui/material";
 import {
   Button,
   Dialog,
   DialogHeader,
   DialogBody,
   DialogFooter,
-} from '@material-tailwind/react';
-import Cookies from 'js-cookie';
-import axios from 'axios';
+} from "@material-tailwind/react";
+import Cookies from "js-cookie";
+import axios from "axios";
 
 const Navbar = () => {
   const [nav, setNav] = useState(false);
-  const token = Cookies.get('authtoken');
+  const token = Cookies.get("authtoken");
 
   const dispatch = useDispatch();
   const user = useSelector((state) => state.userauth.user);
@@ -38,7 +38,7 @@ const Navbar = () => {
   const error = useSelector((state) => state.userauth.error);
 
   useEffect(() => {
-    dispatch({ type: 'userauth/getUserInformation' });
+    dispatch({ type: "userauth/getUserInformation" });
   }, [dispatch]);
 
   const OpenNav = (state) => {
@@ -48,7 +48,7 @@ const Navbar = () => {
   const DeleteAccount = async () => {
     try {
       const response = await axios.delete(
-        'http://localhost:8000/api/v1/auth/account',
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/auth/account`,
         {
           headers: {
             Authorization: `Bearer ${String(token)}`,
@@ -57,97 +57,123 @@ const Navbar = () => {
       );
 
       if (response.status !== 200) {
-        console.log('opps something went wrong, try again');
-
+        console.log("opps something went wrong, try again");
       }
 
-      Cookies.remove("authtoken")
+      Cookies.remove("authtoken");
       window.location.reload();
-    } catch (error) { 
-      
-    }
-  }
+    } catch (error) {}
+  };
 
-  const SignOutAccount = async () => {
-    try {
-      const response = await axios.delete(
-        'http://localhost:8000/api/v1/auth/account/signout',
-        {
-          headers: {
-            Authorization: `Bearer ${String(token)}`,
-          },
-        }
-      );
+  const SignOutAccount = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "you will be logged out after this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, SignOut!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = axios.delete(
+            `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/auth/account/signout`,
+            {
+              headers: {
+                Authorization: `Bearer ${String(token)}`,
+              },
+            }
+          );
 
-      if (response.status !== 200) {
-        console.log('opps something went wrong, try again');
+          if (response.status !== 200) {
+            console.log("opps something went wrong, try again");
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong!",
+              footer: '<a href="#">Why do I have this issue?</a>',
+            });
+          }
 
+          Cookies.remove("authtoken");
+          window.location.reload();
+
+          Swal.fire({
+            title: "We hate to see you go!",
+            text: "You've been Signed Out of Bloggi",
+            icon: "success",
+          });
+        } catch (error) {}
       }
-
-      Cookies.remove("authtoken")
-      window.location.reload();
-    } catch (error) { }
-  }
+    });
+  };
 
   return (
-    <section className='top-0 relative sticky z-30 '>
-      <header className='bg-white shadow-lg'>
-        <div className='  px-4'>
-          <div className='flex h-16 items-center justify-between'>
-            <div className=' md:flex md:items-center md:gap-12'>
+    <section className="top-0 relative sticky z-30 ">
+      <header className="bg-white shadow-lg">
+        <div className="  px-4">
+          <div className="flex h-16 items-center justify-between">
+            <div className=" md:flex md:items-center md:gap-12">
               <Link
-                className='text-teal-600 flex flex-row items-center gap-2'
-                href='/'>
+                className="text-teal-600 flex flex-row items-center gap-2"
+                href="/"
+              >
                 <Image
-                  className='h-[55px] w-auto object-cover '
+                  className="h-[55px] w-auto object-cover "
                   src={logo}
                   height={200}
                   width={200}
-                  alt=''
+                  alt=""
                 />
               </Link>
             </div>
 
-            <div className='hidden md:block'>
-              <nav aria-label='Global'>
-                <ul className='flex items-center gap-6 text-sm'>
+            <div className="hidden md:block">
+              <nav aria-label="Global">
+                <ul className="flex items-center gap-6 text-sm">
                   <li>
                     <Link
-                      href='/'
-                      className='text-gray-500 transition hover:text-gray-500/75'>
+                      href="/"
+                      className="text-gray-500 transition hover:text-gray-500/75"
+                    >
                       Careers
                     </Link>
                   </li>
 
                   <li>
                     <Link
-                      href='/'
-                      className='text-gray-500 transition hover:text-gray-500/75 flex gap-2 items-center'>
+                      href="/"
+                      className="text-gray-500 transition hover:text-gray-500/75 flex gap-2 items-center"
+                    >
                       Premium
-                      <PiCrownBold className='text-yellow-400 text-base' />
+                      <PiCrownBold className="text-yellow-400 text-base" />
                     </Link>
                   </li>
 
                   <li>
                     <Link
-                      href='/'
-                      className='text-gray-500 transition hover:text-gray-500/75'>
+                      href="/"
+                      className="text-gray-500 transition hover:text-gray-500/75"
+                    >
                       Team
                     </Link>
                   </li>
 
                   <li>
                     <Link
-                      href='/'
-                      className='text-gray-500 transition hover:text-gray-500/75'>
+                      href="/"
+                      className="text-gray-500 transition hover:text-gray-500/75"
+                    >
                       Projects
                     </Link>
                   </li>
 
                   <li>
                     <Link
-                      href='/'
-                      className='text-gray-500 transition hover:text-gray-500/75'>
+                      href="/"
+                      className="text-gray-500 transition hover:text-gray-500/75"
+                    >
                       Community
                     </Link>
                   </li>
@@ -155,19 +181,21 @@ const Navbar = () => {
               </nav>
             </div>
 
-            <div className='flex items-center gap-4'>
-              {loading && !user ?  <CircularProgress /> : error && (
-                <div className='sm:flex sm:gap-4'>
+            <div className="flex items-center gap-4">
+              {!user && (
+                <div className="sm:flex sm:gap-4">
                   <Link
-                    className='rounded-md bg-[#FF3131] px-5 py-2.5 text-sm font-medium text-white shadow'
-                    href='/signin'>
+                    className="rounded-md bg-[#FF3131] px-5 py-2.5 text-sm font-medium text-white shadow"
+                    href="/signin"
+                  >
                     Login
                   </Link>
 
-                  <div className='hidden sm:flex'>
+                  <div className="hidden sm:flex">
                     <Link
-                      className='rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-[#FF3131]'
-                      href='/signup'>
+                      className="rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-[#FF3131]"
+                      href="/signup"
+                    >
                       Register
                     </Link>
                   </div>
@@ -175,97 +203,89 @@ const Navbar = () => {
               )}
 
               {user && (
-                <div className='flex flex-row items-center gap-5'>
-                  <div className='sm:flex sm:gap-4'>
+                <div className="flex flex-row items-center gap-5">
+                  <div className="sm:flex sm:gap-4">
                     <Link
-                      className='rounded-md bg-[#FF3131] px-5 py-2.5 text-sm font-medium text-white shadow'
-                      href='/upload'>
+                      className="rounded-md bg-[#FF3131] px-5 py-2.5 text-sm font-medium text-white shadow"
+                      href="/upload"
+                    >
                       Upload
                     </Link>
                   </div>
                   <button
-                    type='button'
-                    className='group flex shrink-0 items-center rounded-lg transition'>
+                    type="button"
+                    className="group flex shrink-0 items-center rounded-lg transition"
+                  >
                     {user && (
                       <>
-                        <span className='sr-only'>Menu</span>
+                        <span className="sr-only">Menu</span>
                         <Link href={`/user/${user._id}`}>
                           <Image
-                            alt='Man'
+                            alt="Man"
                             src={user.userdp}
-                            className='h-[48px] w-[48px] rounded-full object-cover border border-1 border-gray-300 p-1'
+                            className="h-[48px] w-[48px] rounded-full object-cover border border-1 border-gray-300 p-1"
                             height={200}
                             width={200}
                           />
                         </Link>
 
-
                         <Menu placement="bottom-end">
                           <MenuHandler>
-
                             <svg
-                              xmlns='http://www.w3.org/2000/svg'
-                              className='ms-2 hidden h-5 w-5 text-gray-500 transition group-hover:text-gray-700 sm:block'
-                              viewBox='0 0 20 20'
-                              fill='currentColor'>
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="ms-2 hidden h-5 w-5 text-gray-500 transition group-hover:text-gray-700 sm:block"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
                               <path
-                                fill-rule='evenodd'
-                                d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'
-                                clip-rule='evenodd'
+                                fill-rule="evenodd"
+                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                clip-rule="evenodd"
                               />
                             </svg>
-
                           </MenuHandler>
-                          <MenuList className='mt-5'>
-
+                          <MenuList className="mt-5">
                             <Link
                               href={`/user/${user._id}`}
-                              className='block px-4 underline-none  py-3 text-sm text-gray-600 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-100'>
+                              className="block px-4 underline-none  py-3 text-sm text-gray-600 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-100"
+                            >
                               View profile
                             </Link>
-                            <hr className='border-gray-200' />
-
+                            <hr className="border-gray-200" />
 
                             <Link
-                              href='#'
-                              className='block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-100'>
+                              href="#"
+                              className="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-100"
+                            >
                               Settings
                             </Link>
 
-                            <hr className='border-gray-200' />
+                            <hr className="border-gray-200" />
 
                             <Link
-                              href='#'
-                              className='block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-100'>
+                              href="#"
+                              className="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-100"
+                            >
                               Help
                             </Link>
 
-                            <hr className='border-gray-200' />
+                            <hr className="border-gray-200" />
 
-                            <p onClick={SignOutAccount}
-                              className='block cursor-pointer px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-100'>
+                            <p
+                              onClick={SignOutAccount}
+                              className="block cursor-pointer px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-100"
+                            >
                               Sign Out
                             </p>
 
-                            <hr className='border-gray-200' />
+                            {/* <hr className='border-gray-200' />
 
                             <Button
                               className='block px-4 py-2 mt-2 mx-2 text-sm text-gray-600 bg-transparent capitalize transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-100'
                               onClick={DeleteAccount}
                             >
                               Delete Account
-                            </Button>
-
-
-
-
-
-
-
-
-
-
-
+                            </Button> */}
                           </MenuList>
                         </Menu>
                       </>
@@ -277,17 +297,7 @@ const Navbar = () => {
           </div>
         </div>
       </header>
-      {user && (
-        <>
-          {nav && (
-            <div className='absolute right-8  z-54 w-[15%] py-2 mt-2 overflow-hidden bg-white rounded-md shadow-xl'>
-
-
-
-            </div>
-          )}{' '}
-        </>
-      )}
+      
     </section>
   );
 };

@@ -12,7 +12,7 @@ const CheckAuth = (id = token) => {
 
   if (token) {
     axios
-      .get('http://localhost:8000/api/v1/auth/account', {
+      .get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/auth/account`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

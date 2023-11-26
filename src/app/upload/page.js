@@ -60,7 +60,7 @@ function CreateBlog() {
     try {
       setState("loading");
       const response = await axios.post(
-        "http://localhost:8000/api/v1/blog/create",
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/blog/create`,
         formData,
         {
           headers: {
@@ -84,9 +84,8 @@ function CreateBlog() {
 
       Swal.fire({
         title: "Your post is Live",
-        text: "That thing is still around?",
+        text: "We are incredibly proud of you for sharing your post. Your voice matters!",
         icon: "success",
-        showConfirmButton: true,
       });
 
       router.push(`/${response.data.blogData._id}`);
@@ -123,6 +122,8 @@ function CreateBlog() {
                 className="w-full p-4 text-sm border border-gray-300 rounded-lg shadow-sm"
                 placeholder="Blog Title"
                 onChange={(e) => setTitle(e.target.value)}
+                required
+                min={74}
               />
             </div>
             <div>
@@ -134,6 +135,8 @@ function CreateBlog() {
                 value={shortdescription}
                 className="w-full p-4 text-sm border border-gray-300 rounded-lg shadow-sm"
                 placeholder="Short Description"
+                required
+                min={92}
                 onChange={(e) => setShortDescription(e.target.value)}
               />
             </div>
@@ -143,6 +146,7 @@ function CreateBlog() {
                   name="blog-category"
                   className="block w-full px-3 py-4 text-sm text-gray-700 border-gray-300 rounded-md shadow-sm"
                   onChange={(e) => setCategory(e.target.value)}
+                  required
                 >
                   <option value="uncategorized">Uncategorized</option>
                   <option value="technology">Technology</option>
@@ -206,6 +210,7 @@ function CreateBlog() {
                 name="blogimage"
                 onChange={handleImageChange}
                 type="file"
+                required
                 className="block w-full mt-2 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-black file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-60"
                 accept="image/*"
               />
@@ -235,6 +240,7 @@ function CreateBlog() {
                 className="w-full h-full text-sm rounded-lg"
                 value={longdescription}
                 onChange={handleChange}
+                required
               />
             </div>
             <ReactiveButton

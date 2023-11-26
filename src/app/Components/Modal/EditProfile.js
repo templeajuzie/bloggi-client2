@@ -26,10 +26,10 @@ const EditProfile = ({ size, handleOpen }) => {
   }, []);
 
   const [state, setState] = useState('idle');
-  const [selectedphoto, setSelectedPhoto] = useState(user.userdp)
-  const [fullname, setFullname] = useState(user.fullname);
-  const [username, setUsername] = useState(user.username);
-  const [userbio, setUserBio] = useState(user.userbio);
+  const [selectedphoto, setSelectedPhoto] = useState(!user? "" : user.userdp )
+  const [fullname, setFullname] = useState(!user? "" : user.fullname);
+  const [username, setUsername] = useState(!user? "" : user.username);
+  const [userbio, setUserBio] = useState(!user? "" : user.userbio);
   const [userphoto, setUserPhoto] = useState();
 
 
@@ -53,7 +53,7 @@ const EditProfile = ({ size, handleOpen }) => {
     try {
       setState('loading');
       const response = await axios.patch(
-        'http://localhost:8000/api/v1/auth/account',
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/auth/account`,
         formData,
         {
           headers: {

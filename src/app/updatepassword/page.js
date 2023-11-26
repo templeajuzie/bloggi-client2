@@ -26,7 +26,7 @@ function UpdatePassword() {
     try {
       setState('loading');
       const response = await axios.post(
-        'http://localhost:8000/api/v1/auth/account/updatepassword',
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/auth/account/updatepassword`,
         {
           reset,
           password,

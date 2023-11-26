@@ -5,6 +5,8 @@ import Link from 'next/link';
 
 const Offline = () => {
 
+  // console.log('loading offline');
+
   const reFresh = () => {
     window.location.reload();
   }

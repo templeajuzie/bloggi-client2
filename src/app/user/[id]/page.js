@@ -6,7 +6,7 @@ import EditProfile from "@/app/Components/Modal/EditProfile";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { FaCamera } from "react-icons/fa";
@@ -14,6 +14,7 @@ import { Button } from "@material-tailwind/react";
 import DynamicFeedIcon from "@mui/icons-material/DynamicFeed";
 import Link from "next/link";
 import { HiOutlineDotsVertical } from "react-icons/hi";
+import io from "socket.io-client";
 
 const UserProfile = () => {
   const user = useSelector((state) => state.userauth.user);
@@ -24,12 +25,14 @@ const UserProfile = () => {
   const [blognav, setBlogNav] = useState(false);
   const [userdata, setUserData] = useState(null);
   const [userpost, setUserPost] = useState(null);
+  const socket = io.connect(`${process.env.NEXT_PUBLIC_SERVER_URL}`);
 
   const loading = useSelector((state) => state.userauth.loading);
   const error = useSelector((state) => state.userauth.error);
 
   const params = useParams();
   const dispatch = useDispatch();
+  const socketRef = useRef(null);
 
   const [size, setSize] = useState(null);
 
@@ -41,7 +44,7 @@ const UserProfile = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/v1/auth/user/${params.id}`
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/auth/user/${params.id}`
         );
 
         if (response.status === 200) {
@@ -58,58 +61,87 @@ const UserProfile = () => {
     };
 
     fetchData();
+
+    if (!socketRef.current) {
+    }
+
+    // Clean up socket on component unmount
   }, []);
+
+  useEffect(() => {
+    socket.on("profileconnect", (data) => {
+      setLike(data);
+      console.log(data);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
 
   const PostNav = () => {
     setBlogNav(!blognav);
   };
 
+  const userConnect = () => {
+    let profileid = params.id;
+
+    let userid = String(user._id);
+
+    let connectData = {
+      profileid,
+      userid,
+    };
+
+    socket.emit("userconnect", connectData);
+  };
+
   return (
     <>
       <Navbar />
-      <div className="bg-gray-200 h-auto">
+      <div className="h-auto bg-gray-200">
         <div className="flex items-start pt-[65px] justify-left">
           {userdata === null ? (
             <div className=" w-full lg:w-[70%] flex flex-col gap-5 items-center justify-start px-20 md:flex-col lg:flex-row">
               <div className="object-center">
-                <div className="rounded-full w-40 h-40 animate-pulse bg-gray-300"></div>
+                <div className="w-40 h-40 bg-gray-300 rounded-full animate-pulse"></div>
               </div>
 
-              <div className="content w-full flex-grow p-6">
-                <div className="flex justify-between items-center mb-5 text-gray-300 w-full">
+              <div className="flex-grow w-full p-6 content">
+                <div className="flex items-center justify-between w-full mb-5 text-gray-300">
                   <span className="text-sm"></span>
                 </div>
 
-                <div className="flex items-center space-x-4 my-1 w-full">
+                <div className="flex items-center w-full my-1 space-x-4">
                   <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
-                  <span className="font-medium bg-gray-300 h-5 w-20"></span>
+                  <span className="w-20 h-5 font-medium bg-gray-300"></span>
                 </div>
 
-                <div className="mb-2 text-2xl w-full font-bold tracking-tight text-gray-300 bg-gray-300 h-8 rounded"></div>
-                <div className="mb-5 font-light w-full text-gray-300 bg-gray-300 h-4 rounded"></div>
-                <div className="flex justify-between w-full items-center">
+                <div className="w-full h-8 mb-2 text-2xl font-bold tracking-tight text-gray-300 bg-gray-300 rounded"></div>
+                <div className="w-full h-4 mb-5 font-light text-gray-300 bg-gray-300 rounded"></div>
+                <div className="flex items-center justify-between w-full">
                   <div className="inline-flex items-center font-medium text-gray-300 hover:underline">
-                    <div className="ml-2 w-4 h-4 bg-gray-300 rounded-full"></div>
+                    <div className="w-4 h-4 ml-2 bg-gray-300 rounded-full"></div>
                   </div>
                 </div>
               </div>
             </div>
           ) : (
             <>
-              <div className="flex flex-col gap-5 items-center justify-center md:flex-col lg:flex-row ">
-                <div className="object-center lg:ml-20 bg-transparent p-1 rounded-full bg-white">
+              <div className="flex flex-col items-center justify-center gap-5 md:flex-col lg:flex-row ">
+                <div className="object-center p-1 bg-transparent bg-white rounded-full lg:ml-20">
                   <Image
                     alt="Profile Picture"
                     src={userdata.userdp}
-                    className="rounded-full w-36 h-36 object-cover"
+                    className="object-cover rounded-full w-36 h-36"
                     width={500}
                     height={500}
                   />
                 </div>
 
-                <div className="col-span-4 flex flex-col gap-4 justify-center items-center lg:justify-start lg:items-start">
-                  <div className="text-gray-800 flex flex-col items-end md:flex-row md:items-end gap-5 lg:item-center lg:items-end">
-                    <div className="a flex flex-col gap-2 items-center lg:items-start">
+                <div className="flex flex-col items-center justify-center col-span-4 gap-4 lg:justify-start lg:items-start">
+                  <div className="flex flex-col items-center gap-5 text-gray-800 md:flex-row md:items-end lg:item-center lg:items-end">
+                    <div className="flex flex-col items-center gap-2 a lg:items-start">
                       <div className="font-medium">{userdata.username}</div>
 
                       <div className="text-2xl">{userdata.fullname}</div>
@@ -119,13 +151,18 @@ const UserProfile = () => {
                       <div className="lg:ml-10">
                         {user._id !== userdata._id ? (
                           <div className="">
-                            <button className="px-6 py-2 text-gray-100 bg-[#FF3131] flex w-fit items-center justify-center rounded">
-                              Follow
-                              <AiOutlineUserAdd className="bx bx-user-plus ml-2" />
+                            <button
+                              className="px-6 py-2 text-gray-100 bg-[#FF3131] flex w-fit items-center justify-center rounded"
+                              onClick={userConnect}
+                            >
+                              {user.following.includes(String(userdata._id))
+                                ? "Following"
+                                : "Follow"}
+                              <AiOutlineUserAdd className="ml-2 bx bx-user-plus" />
                             </button>
                           </div>
                         ) : (
-                          <div className="b flex flex-row gap-4 items-center ">
+                          <div className="flex flex-row items-center gap-4 b ">
                             <Button
                               onClick={() => handleOpen("xs")}
                               variant="gradient"
@@ -135,7 +172,7 @@ const UserProfile = () => {
 
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
-                              className="h-6 w-6"
+                              className="w-6 h-6"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -161,7 +198,7 @@ const UserProfile = () => {
                     )}
                   </div>
 
-                  <div className="text-gray-800 flex flex-row gap-10 items-center">
+                  <div className="flex flex-row items-center gap-10 text-gray-800">
                     <div>
                       <span className="font-semibold">
                         {" "}
@@ -187,7 +224,7 @@ const UserProfile = () => {
                     </div>
                   </div>
 
-                  <div className="text-gray-800 flex flex-col justify-center items-center lg:justify-start lg:items-start">
+                  <div className="flex flex-col items-center justify-center text-gray-800 lg:justify-start lg:items-start">
                     <p className="w-[80%] md:w-[70%] text-center lg:text-start">
                       {userdata.userbio}
                     </p>
@@ -202,9 +239,9 @@ const UserProfile = () => {
 
         <div>
           <section className="lg:px-10">
-            <div className="container px-2 md:px-2 py-10 pt-2 mx-auto">
+            <div className="container px-2 py-10 pt-2 mx-auto md:px-2">
               {userpost === null ? (
-                <div className="animate-pulse grid grid-cols-1 gap-8 mt-8 xl:mt-12 xl:gap-8 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-8 mt-8 animate-pulse xl:mt-12 xl:gap-8 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 lg:grid-cols-3">
                   <div className="w-full ">
                     <div className="w-full h-64 bg-gray-300 rounded-lg dark:bg-gray-600"></div>
 
@@ -212,14 +249,14 @@ const UserProfile = () => {
                     <p className="w-24 h-2 mt-4 bg-gray-200 rounded-lg dark:bg-gray-700"></p>
                   </div>
 
-                  <div className="w-full hidden sm:block">
+                  <div className="hidden w-full sm:block">
                     <div className="w-full h-64 bg-gray-300 rounded-lg dark:bg-gray-600"></div>
 
                     <h1 className="w-56 h-2 mt-4 bg-gray-200 rounded-lg dark:bg-gray-700"></h1>
                     <p className="w-24 h-2 mt-4 bg-gray-200 rounded-lg dark:bg-gray-700"></p>
                   </div>
 
-                  <div className="w-full hidden lg:block">
+                  <div className="hidden w-full lg:block">
                     <div className="w-full h-64 bg-gray-300 rounded-lg dark:bg-gray-600"></div>
 
                     <h1 className="w-56 h-2 mt-4 bg-gray-200 rounded-lg dark:bg-gray-700"></h1>
@@ -231,7 +268,7 @@ const UserProfile = () => {
                   <div className="grid grid-cols-1 gap-4 mt-8 xl:mt-12 xl:gap-12 sm:grid-cols-2 xl:grid-cols-3 lg:grid-cols-3">
                     {userpost.map((post) => (
                       <div
-                        className="transition-all relative duration-150 flex w-full py-6 md:w-full lg:w-full"
+                        className="relative flex w-full py-6 transition-all duration-150 md:w-full lg:w-full"
                         key={post.id}
                       >
                         <div className="flex flex-col items-stretch min-h-full pb-4 mb-6 transition-all duration-150 bg-white rounded-lg shadow-lg hover:shadow-2xl">
@@ -251,7 +288,7 @@ const UserProfile = () => {
                               {post.category}
                             </span>
                             <div className="flex flex-row items-center">
-                              <div className="text-xs font-medium text-gray-500 flex flex-row items-center mr-2">
+                              <div className="flex flex-row items-center mr-2 text-xs font-medium text-gray-500">
                                 <svg
                                   className="w-4 h-4 mr-1"
                                   fill="none"
@@ -272,10 +309,10 @@ const UserProfile = () => {
                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                                   ></path>
                                 </svg>
-                                <span>{post.view.length}</span>
+                                <span>{post.view}</span>
                               </div>
 
-                              <div className="text-xs font-medium text-gray-500 flex flex-row items-center mr-2">
+                              <div className="flex flex-row items-center mr-2 text-xs font-medium text-gray-500">
                                 <svg
                                   className="w-4 h-4 mr-1"
                                   fill="none"
@@ -293,7 +330,7 @@ const UserProfile = () => {
                                 <span>{post.comment.length}</span>
                               </div>
 
-                              <div className="text-xs font-medium text-gray-500 flex flex-row items-center">
+                              <div className="flex flex-row items-center text-xs font-medium text-gray-500">
                                 <svg
                                   className="w-4 h-4 mr-1"
                                   fill="none"
@@ -313,7 +350,7 @@ const UserProfile = () => {
                             </div>
                           </div>
                           <hr className="border-gray-300" />
-                          <div className="flex flex-wrap items-center flex-1 px-4 py-1 text-start w-full">
+                          <div className="flex flex-wrap items-center flex-1 w-full px-4 py-1 text-start">
                             <Link href={`/${post._id}`}>
                               <h2 className="text-lg font-bold tracking-normal text-gray-800">
                                 {post.title}
@@ -337,10 +374,10 @@ const UserProfile = () => {
                             </div>
 
                             {blognav && (
-                              <div className="absolute flex flex-col rounded-base w-fit right-0 bg-white shadow-lg">
+                              <div className="absolute right-0 flex flex-col bg-white shadow-lg rounded-base w-fit">
                                 {post.authorid === user._id ? (
                                   <>
-                                    <p className="text-sm flex flex-row hover:cursor-pointer gap-2 py-2 px-6 items-center hover:bg-gray-100 rounded">
+                                    <p className="flex flex-row items-center gap-2 px-6 py-2 text-sm rounded hover:cursor-pointer hover:bg-gray-100">
                                       <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         fill="none"
@@ -363,7 +400,7 @@ const UserProfile = () => {
                                 )}
 
                                 <hr />
-                                <p className="text-sm flex flex-row gap-2 hover:cursor-pointer py-2 px-6 items-center hover:bg-gray-100 rounded">
+                                <p className="flex flex-row items-center gap-2 px-6 py-2 text-sm rounded hover:cursor-pointer hover:bg-gray-100">
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
@@ -381,7 +418,7 @@ const UserProfile = () => {
                                   Report
                                 </p>
                                 <hr />
-                                <p className="text-sm flex flex-row gap-2 hover:cursor-pointer py-2 px-6 items-center hover:bg-gray-100 rounded">
+                                <p className="flex flex-row items-center gap-2 px-6 py-2 text-sm rounded hover:cursor-pointer hover:bg-gray-100">
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
@@ -402,7 +439,7 @@ const UserProfile = () => {
 
                                 {post.authorid === user._id ? (
                                   <>
-                                    <p className="text-sm flex flex-row gap-2 hover:cursor-pointer py-2 px-6 items-center hover:bg-gray-100 rounded">
+                                    <p className="flex flex-row items-center gap-2 px-6 py-2 text-sm rounded hover:cursor-pointer hover:bg-gray-100">
                                       <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         fill="none"
@@ -435,13 +472,13 @@ const UserProfile = () => {
 
               {userpost && userpost.length <= 0 ? (
                 <div className="h-[70vh] w-full bg-gray-100 flex items-center rounded-lg">
-                  <div className="container flex flex-col md:flex-row items-center justify-center px-5 text-gray-700">
+                  <div className="container flex flex-col items-center justify-center px-5 text-gray-700 md:flex-row">
                     <div className="max-w-md">
-                      <div className="text-3xl font-dark font-bold">
+                      <div className="text-3xl font-bold font-dark">
                         No Post Found
                       </div>
-                      <div className="flex flex-row gap-3 items-center">
-                        <p className="text-2xl md:text-2xl font-light leading-normal">
+                      <div className="flex flex-row items-center gap-3">
+                        <p className="text-2xl font-light leading-normal md:text-2xl">
                           Sorry we couldnt find any post.
                         </p>
                         <DynamicFeedIcon className="text-[50px]" />
@@ -452,11 +489,7 @@ const UserProfile = () => {
                       </p>
 
                       <Link href="/upload">
-                        <Button
-                          variant="gradient"
-                        >
-                          Create Post
-                        </Button>
+                        <Button variant="gradient">Create Post</Button>
                       </Link>
                     </div>
                   </div>

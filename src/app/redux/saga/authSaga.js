@@ -9,7 +9,7 @@ async function fetchUserInformation() {
   try {
     const token = Cookies.get('authtoken');
     const response = await axios.get(
-      `http://localhost:8000/api/v1/auth/account`,
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/auth/account`,
       {
         headers: {
           Authorization: `Bearer ${String(token)}`,
