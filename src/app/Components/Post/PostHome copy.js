@@ -14,12 +14,11 @@ import Tooltip from "@mui/material/Tooltip";
 import io from "socket.io-client";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-import { FaHandsClapping } from "react-icons/fa6";
 
 function PostHome() {
   const [blogs, setBlogs] = useState(null);
   const [loads, setLoads] = useState(true);
-  const [allclap, setallClap] = useState(null);
+  const [like, setLike] = useState([]);
   const dispatch = useDispatch();
   const [dataFetched, setDataFetched] = useState(false);
   const token = Cookies.get("authtoken");
@@ -37,10 +36,28 @@ function PostHome() {
   const error = useSelector((state) => state.userauth.error);
   const [blogLoading, setBlogLoading] = useState(false);
 
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/blog`);
+      if (response.data && response.data.allblog) {
+        setBlogs(response.data.allblog);
+        setLoads(false);
+        setDataFetched(true);
+        console.log("This is the fetched data:", response.data.allblog);
+      } else {
+        setLoads(false);
+        console.log("No blog posts found");
+      }
+    } catch (error) {
+      console.error(error);
+      setLoads(false); // Set loads to false on error to handle the loading state
+    }
+  };
+
   useEffect(() => {
     socket.on("alllike", (data) => {
       setLike(data);
-      console.log("this is data", allclap);
+      console.log(data);
     });
 
     return () => {
@@ -49,27 +66,6 @@ function PostHome() {
   }, [socket]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/blog`
-        );
-        if (response.data && response.data.allblog) {
-          setBlogs(response.data.allblog);
-          setallClap(response.data.allblog.like)
-          setLoads(false);
-          setDataFetched(true);
-          console.log("This is the fetched data:", response.data.allblog);
-        } else {
-          setLoads(false);
-          console.log("No blog posts found");
-        }
-      } catch (error) {
-        console.error(error);
-        setLoads(false); // Set loads to false on error to handle the loading state
-      }
-    };
-
     fetchData();
   }, []);
 
@@ -96,7 +92,7 @@ function PostHome() {
   return (
     <div>
       <section className="bg-white">
-        <div className="flex flex-row justify-between h-full gap-5 px-0 py-3 mx-auto lg:py-6 lg:px-6">
+        <div className="flex flex-row justify-between h-full gap-5 px-4 py-3 mx-auto lg:py-6 lg:px-6">
           <div className="grid gap-8 lg:grid-cols-1 w-full md:w-full lg:w-[65%]">
             {!blogs && (
               <article className="flex flex-col items-center w-full gap-4 border border-gray-200 rounded-lg shadow-md h-fit lg:flex-row animate-pulse sm:flex-col">
@@ -136,14 +132,14 @@ function PostHome() {
                     <article
                       key={post.id}
                       // className='flex flex-col items-center gap-4 bg-white border border-gray-200 rounded-lg shadow-md md:flex-row lg:flex-row'>
-                      className="flex flex-col items-center w-full gap-4 px-2 mb-5 bg-white rounded-lg shadow-lg h-fit md:flex-row lg:flex-row"
+                      className="flex flex-col items-center w-full gap-4 mb-5 bg-white rounded-lg shadow-lg h-fit md:flex-row lg:flex-row"
                     >
                       <Link
                         href={`/${post._id}`}
                         className="h-full w-full md:w-[50%] lg:w-[50%] xl:w-[50%]"
                       >
                         <Image
-                          className="rounded-lg h-full md:h-[270px] w-full object-cover"
+                          className="rounded-lg h-[270px] w-full object-cover"
                           src={post.blogimage}
                           alt="Blog post"
                           width={440}
@@ -198,33 +194,27 @@ function PostHome() {
                               arrow
                             >
                               <div className="flex flex-row items-center mr-2 text-xs font-medium text-gray-500">
-                                <Link href={`/${post._id}`}>
-                                  <svg
-                                    className="w-4 h-4 mr-1 cursor-pointer"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="2"
-                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                    ></path>
-                                    <path
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="2"
-                                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                    ></path>
-                                  </svg>
-                                </Link>
-                                <Link href={`/${post._id}`}>
-                                  <span className="cursor-pointer">
-                                    {post.view}
-                                  </span>
-                                </Link>
+                                <svg
+                                  className="w-4 h-4 mr-1"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                  ></path>
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                  ></path>
+                                </svg>
+                                <span>{post.view}</span>
                               </div>
                             </Tooltip>
 
@@ -234,46 +224,44 @@ function PostHome() {
                               arrow
                             >
                               <div className="flex flex-row items-center mr-2 text-xs font-medium text-gray-500">
-                                <Link href={`/${post._id}`}>
-                                  <svg
-                                    className="w-4 h-4 mr-1 cursor-pointer"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="2"
-                                      d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-                                    ></path>
-                                  </svg>
-                                </Link>
-                                <Link href={`/${post._id}`}>
-                                  <span className="cursor-pointer">
-                                    {post.comment.length}
-                                  </span>
-                                </Link>
+                                <svg
+                                  className="w-4 h-4 mr-1"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                                  ></path>
+                                </svg>
+                                <span>{post.comment.length}</span>
                               </div>
                             </Tooltip>
 
                             <Tooltip
-                              title={`${post.like.length} Claps`}
+                              title={`${like.length} Likes`}
                               placement="top"
                               arrow
                             >
                               <div className="flex flex-row items-center text-xs font-medium text-gray-500 cursor-pointer">
-                                <FaHandsClapping
+                                <svg
                                   className={
-                                    user && post.like.includes(String(user._id))
+                                    user && like.includes(String(user._id))
                                       ? postlike
                                       : postunlike
                                   }
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
                                   onClick={() => {
-                                    
+                                    let blogid = String(post._id);
                                     if (user) {
-                                      router.push(`/${post._id}`);
+                                      PostReaction(blogid);
                                     } else {
                                       Swal.fire({
                                         title: "You need to Sign In",
@@ -283,9 +271,33 @@ function PostHome() {
                                       router.push("/signin");
                                     }
                                   }}
-                                />
-
-                                <span>{post.like.length}</span>
+                                >
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
+                                  ></path>
+                                </svg>
+                                {/* <svg
+                                  className="w-4 h-4 mr-1 text-blue-500"
+                                  fill="currentColor"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  onClick={() => {
+                                    let blogid = String(post._id);
+                                    Like(blogid);
+                                  }}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
+                                  ></path>
+                                </svg> */}
+                                <span>{like.length}</span>
                               </div>
                             </Tooltip>
                           </div>

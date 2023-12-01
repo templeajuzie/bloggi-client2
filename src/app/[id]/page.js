@@ -12,6 +12,7 @@ import { AiOutlineUserAdd } from "react-icons/ai";
 import parse from "html-react-parser";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import Swal from "sweetalert2";
+import Tooltip from "@mui/material/Tooltip";
 
 import { TbEdit } from "react-icons/tb";
 import {
@@ -27,6 +28,9 @@ import { Diversity1Sharp } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { useRef } from "react";
 import io from "socket.io-client";
+import { FaHandsClapping } from "react-icons/fa6";
+import PostChat from "../Components/Modal/PostChat";
+// import PostComment from "@/app/Components/Modal/PostComment";
 
 const BlogPost = () => {
   const params = useParams();
@@ -37,40 +41,58 @@ const BlogPost = () => {
   const socket = io.connect(`${process.env.NEXT_PUBLIC_SERVER_URL}`);
 
   const [blog, setBlog] = useState(null);
-  const [usercomment, setUserComment] = useState(null);
+  const [usercomment, setUserComment] = useState("");
   const [allComments, setAllComments] = useState(null);
+  const [allclap, setallClap] = useState(null);
   const [blognav, setBlogNav] = useState(false);
   const isInitialRender = useRef(true);
-  
 
   const user = useSelector((state) => state.userauth.user);
 
-  const FetchData = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/blog/${params.id}`
-      );
+  const [size, setSize] = useState(null);
+  const handleOpen = (value) => setSize(value);
 
-      if (response.status === 200) {
-        setBlog(response.data.blogdata);
-
-        setAllComments(response.data.blogdata.comment);
-        console.log(comment);
-      }
-
-      console.log(response.data.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const postlike = "w-4 h-4 mr-1 text-blue-500";
+  const postunlike = "w-4 h-4 mr-1";
 
   const PostNav = () => {
     setBlogNav(!blognav);
   };
 
+  const PostComment = async (e) => {
+    // e.preventDefault();
+
+    if (user) {
+      let userid = String(user._id);
+
+      const blogid = params.id;
+
+      let commentData = {
+        usercomment,
+        blogid,
+        userid,
+      };
+
+      socket.emit("newcomment", commentData);
+    } else {
+      Swal.fire({
+        title: "You need to Sign In",
+        text: "Before you can comment on a post",
+        icon: "warning",
+      });
+      router.push("/signin");
+    }
+  };
+
   useEffect(() => {
     socket.on("allcomment", (data) => {
       setAllComments(data);
+      setUserComment("");
+      console.log(data);
+    });
+
+    socket.on("alllike", (data) => {
+      setallClap(data);
       console.log(data);
     });
 
@@ -81,11 +103,28 @@ const BlogPost = () => {
   }, [socket]);
 
   useEffect(() => {
-    FetchData();
-    
-  }, []);
+    const FetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/blog/${params.id}`
+        );
 
-  
+        if (response.status === 200) {
+          setBlog(response.data.blogdata);
+
+          setAllComments(response.data.blogdata.comment);
+          setallClap(response.data.blogdata.like)
+          console.log(response.data.blogdata.comment);
+        }
+
+        console.log(response.data.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    FetchData();
+  }, []);
 
   const deletePost = () => {
     Swal.fire({
@@ -125,42 +164,31 @@ const BlogPost = () => {
     });
   };
 
-  const PostComment = async (e) => {
-    e.preventDefault();
-
-    if (user) {
-      
-      let userid = String(user._id);
-
-      const blogid = params.id;
-
-      let commentData = {
-        usercomment,
-        blogid,
-        userid,
-      };
-
-      socket.emit("newcomment", commentData);
-    } else {
-      Swal.fire({
-        title: "You need to Sign In",
-        text: "Before you can comment on a post",
-        icon: "warning",
-      });
-      router.push("/signin");
-    }
-  };
-
   const viewProfile = (id) => {
     router.push(`/user/${id}`);
   };
 
+  const PostReaction = (id) => {
+    let userid = String(user._id);
+
+    const blogid = id;
+
+    console.log("like " + blogid, userid);
+
+    let likeData = {
+      blogid,
+      userid,
+    };
+
+    socket.emit("postreact", likeData);
+  };
+
   return (
-    <div className="">
+    <div className="relative">
       <Navbar />
       {blog === null ? (
-        <div className="flex flex-col md:mx-10 my-10 lg:flex-row lg:mx-[12%] gap-10">
-          <div class="w-[100%] lg:w-[60%]">
+        <div className="flex flex-col md:mx-10 my-10 lg:flex-row lg:mx-[12%] gap-10 justify-start items-start">
+          <div class="w-full  md:w-[80%] lg:w-[70%]">
             <main className="p-5 shadow-md md:p-5 lg:p-10 animate-pulse">
               <div className="relative w-full mx-auto mb-4 md:mb-0">
                 <div className="flex flex-col gap-4 px-4 mb-3 lg:px-0">
@@ -180,37 +208,59 @@ const BlogPost = () => {
               </div>
             </main>
           </div>
-          <div className="w-[100%] lg:w-[40%]">
-            <div className="w-full p-5 md:p-5 lg:w-full h-fit m-auto max-w-screen-sm lg:sticky lg:top-[50px] animate-pulse">
-              <div className="p-4 border-t border-b md:border md:rounded">
-                <div className="flex py-2">
-                  <div className="w-10 h-10 mr-2 bg-gray-200 rounded-full"></div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-700"></p>
-                    <p className="text-xs font-semibold text-gray-600"></p>
-                  </div>
-                </div>
-                <p class="text-gray-700 py-3"></p>
-                <div className="flex items-center justify-center w-full px-2 py-3 text-gray-100 bg-gray-400 rounded"></div>
-              </div>
-            </div>
-          </div>
         </div>
       ) : (
-        <div className="flex flex-col  md:mx-10 my-10 md:flex-col lg:flex-row lg:px-[2%] gap-10">
-          <div class="w-[100%] md:w-[100%] lg:w-[60%] justify-between lg:px-10">
-            <main className="relative p-5 shadow-md md:p-5 lg:p-10">
-              <div className="w-full mx-auto mb-4 ab md:mb-0">
+        <div className="flex flex-col  md:mx-2 my-10 md:flex-col lg:flex-row lg:px-[2%] md:gap-2 lg:gap-10">
+          <div className="items-center justify-center w-full md:w-[80%] lg:w-[70%] lg:px-10">
+            <main className="relative flex flex-col gap-4 p-5 shadow-md md:p-5 lg:p-10">
+              <div className="flex flex-col w-full gap-4 mx-auto ab md:mb-0">
+                <div className="flex flex-row items-center justify-between">
+                  <div className="flex py-2 ">
+                    <Image
+                      src={blog.author.userdp}
+                      className="object-cover w-10 h-10 mr-2 rounded-full cursor-pointer"
+                      height={40}
+                      width={40}
+                      alt="user"
+                      onClick={() => {
+                        let id = blog.author._id;
+                        viewProfile(id);
+                      }}
+                    />
+                    <div>
+                      <p
+                        className="text-sm font-semibold text-black cursor-pointer"
+                        onClick={() => {
+                          let id = blog.author._id;
+                          viewProfile(id);
+                        }}
+                      >
+                        {blog.author.fullname}
+                      </p>
+                      <p
+                        className="text-xs font-semibold text-black cursor-pointer"
+                        onClick={() => {
+                          let id = blog.author._id;
+                          viewProfile(id);
+                        }}
+                      >
+                        @{blog.author.username}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Link
+                    href={`/category/${blog.category}`}
+                    className="inline-flex items-center justify-center px-4 my-2 mb-2 text-sm text-gray-800"
+                  >
+                    #{blog.category}
+                  </Link>
+                </div>
+
                 <div className="md:px-4 lg:px-0">
                   <h2 className="text-xl font-semibold leading-tight text-gray-800">
                     {blog.title}
                   </h2>
-                  <a
-                    href="#"
-                    className="inline-flex items-center justify-center py-2 mb-2 text-green-700"
-                  >
-                    {blog.category}
-                  </a>
                 </div>
 
                 <div className="relative flex flex-col w-full h-full show">
@@ -221,35 +271,263 @@ const BlogPost = () => {
                     height={500}
                     alt="blog"
                   />
+                </div>
 
-                  <div className="absolute top-0 left-0 flex w-full px-5 py-2 bg-black bg-opacity-50 md:hidden">
-                    <div className="flex py-2 ">
-                      <Image
-                        src={blog.blogimage}
-                        className="object-cover w-10 h-10 mr-2 rounded-full"
-                        height={40}
-                        width={40}
-                        alt="user"
-                      />
-                      <div>
-                        <p className="text-sm font-semibold text-gray-100">
-                          {" "}
-                          Mike Sullivan{" "}
-                        </p>
-                        <p className="text-xs font-semibold text-gray-100">
-                          {" "}
-                          Editor{" "}
-                        </p>
+                <div className="hidden md:block">
+                  <div className="flex flex-row items-center w-full gap-5 ">
+                    <div
+                      className="flex flex-row items-center w-full gap-5 px-2 py-1 bg-gray-200 rounded-full cursor-pointer"
+                      onClick={() => {
+                        handleOpen("sm");
+                      }}
+                    >
+                      <div className="p-1 bg-white rounded-full h-fit w-fit">
+                        <Image
+                          src={blog.author.userdp}
+                          className="object-cover w-8 h-8 rounded-full cursor-pointer"
+                          height={30}
+                          width={30}
+                          alt="user"
+                          onClick={() => {
+                            let id = blog.author._id;
+                            viewProfile(id);
+                          }}
+                        />
                       </div>
-                      <AiOutlineUserAdd className="ml-2 text-xl bx bx-user-plus text-[#FF3131]" />
+                      <div>
+                        <p>Write Comment...</p>
+                      </div>
                     </div>
+
+                    <div className="flex flex-row items-center">
+                      <Tooltip
+                        title={`${blog.view} Views`}
+                        placement="top"
+                        arrow
+                      >
+                        <div className="flex flex-row items-center mr-2 text-xs font-medium text-gray-500">
+                          <svg
+                            className="w-4 h-4 mr-1 cursor-pointer"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                            ></path>
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                            ></path>
+                          </svg>
+
+                          <span className="cursor-pointer">{blog.view}</span>
+                        </div>
+                      </Tooltip>
+
+                      <Tooltip
+                        title={`${blog.comment.length} Comments`}
+                        placement="top"
+                        arrow
+                      >
+                        <div
+                          className="flex flex-row items-center mr-2 text-xs font-medium text-gray-500 cursor-pointer"
+                          onClick={() => {
+                            handleOpen("sm");
+                          }}
+                        >
+                          <svg
+                            className="w-4 h-4 mr-1 cursor-pointer"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                            ></path>
+                          </svg>
+
+                          <span className="cursor-pointer">
+                            {blog.comment.length}
+                          </span>
+                        </div>
+                      </Tooltip>
+
+                      <Tooltip
+                        title={`${allclap.length} Claps`}
+                        placement="top"
+                        arrow
+                      >
+                        <div className="flex flex-row items-center text-xs font-medium text-gray-500 cursor-pointer">
+                        <FaHandsClapping
+                          className={
+                            user && allclap.includes(String(user._id))
+                              ? postlike
+                              : postunlike
+                          }
+                          onClick={() => {
+                            let id = blog._id;
+                            if (user) {
+                              PostReaction(id);
+                            } else {
+                              Swal.fire({
+                                title: "You need to Sign In",
+                                text: "Before you can like a post",
+                                icon: "warning",
+                              });
+                              router.push("/signin");
+                            }
+                          }}
+                        />
+
+                        <span>{allclap.length}</span>
+                      </div>
+                      </Tooltip>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-row items-center w-full gap-5 md:hidden">
+                  <div
+                    className="flex flex-row items-center w-full gap-5 px-2 py-1 bg-gray-200 rounded-full cursor-pointer"
+                    onClick={() => {
+                      handleOpen("xxl");
+                    }}
+                  >
+                    <div className="p-1 bg-white rounded-full h-fit w-fit">
+                      <Image
+                        src={blog.author.userdp}
+                        className="object-cover w-8 h-8 rounded-full cursor-pointer"
+                        height={30}
+                        width={30}
+                        alt="user"
+                        onClick={() => {
+                          let id = blog.author._id;
+                          viewProfile(id);
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <p>Write Comment...</p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-row items-center">
+                    <Tooltip title={`${blog.view} Views`} placement="top" arrow>
+                      <div className="flex flex-row items-center mr-2 text-xs font-medium text-gray-500">
+                        <svg
+                          className="w-4 h-4 mr-1 cursor-pointer"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          ></path>
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          ></path>
+                        </svg>
+
+                        <span className="cursor-pointer">{blog.view}</span>
+                      </div>
+                    </Tooltip>
+
+                    <Tooltip
+                      title={`${blog.comment.length} Comments`}
+                      placement="top"
+                      arrow
+                    >
+                      <div
+                        className="flex flex-row items-center mr-2 text-xs font-medium text-gray-500 cursor-pointer"
+                        onClick={() => {
+                          handleOpen("xxl");
+                        }}
+                      >
+                        <svg
+                          className="w-4 h-4 mr-1 cursor-pointer"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                          ></path>
+                        </svg>
+
+                        <span className="cursor-pointer">
+                          {blog.comment.length}
+                        </span>
+                      </div>
+                    </Tooltip>
+
+                    <Tooltip
+                      title={`${allclap.length} Claps`}
+                      placement="top"
+                      arrow
+                    >
+                      <div className="flex flex-row items-center text-xs font-medium text-gray-500 cursor-pointer">
+                        <FaHandsClapping
+                          className={
+                            user && allclap.includes(String(user._id))
+                              ? postlike
+                              : postunlike
+                          }
+                          onClick={() => {
+                            let id = blog._id;
+                            if (user) {
+                              PostReaction(id);
+                            } else {
+                              Swal.fire({
+                                title: "You need to Sign In",
+                                text: "Before you can like a post",
+                                icon: "warning",
+                              });
+                              router.push("/signin");
+                            }
+                          }}
+                        />
+
+                        <span>{allclap.length}</span>
+                      </div>
+                    </Tooltip>
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col lg:flex-row">
-                <div className="w-full mt-12 text-lg leading-relaxed text-gray-700 lg:px-0 lg:w-full">
-                  {/* <p className='pb-6'>{blog.longdescription}</p> */}
+              <PostChat
+                size={size}
+                handleOpen={handleOpen}
+                PostComment={PostComment}
+                usercomment={usercomment}
+                blog={blog}
+                setUserComment={setUserComment}
+                allComments={allComments}
+              />
+
+              <div className="flex flex-col mt-4">
+                <div className="w-full text-lg leading-relaxed text-gray-700 lg:px-0 lg:w-full">
                   {parse(blog.longdescription)}
                 </div>
               </div>
@@ -360,153 +638,6 @@ const BlogPost = () => {
                 </div>
               </div>
             </main>
-          </div>
-
-          <div class="w-[100%]  lg:w-[40%]">
-            <div className="top-0 left-0 flex items-center justify-between w-full px-5 py-2 bg-black rounded-t-lg jus bg-opacity-85">
-              <div className="flex py-2 ">
-                <Image
-                  src={blog.author.userdp}
-                  className="object-cover w-10 h-10 mr-2 rounded-full"
-                  height={40}
-                  width={40}
-                  alt="user"
-                />
-                <div>
-                  <p className="text-sm font-semibold text-gray-100">
-                  {blog.author.fullname}
-                  </p>
-                  <p className="text-xs font-semibold text-gray-100">
-                  {blog.author.username}
-                  </p>
-                </div>
-              </div>
-              <div
-                className="flex flex-row items-center gap-2 px-3 py-2 rounded-md cursor-pointer hover:bg-blue-gray-900"
-                onClick={() => {
-                  let id = blog.author._id;
-                  viewProfile(id);
-                }}
-              >
-                <p className="text-gray-100 text-[14px]">View profile</p>
-                <AiOutlineUserAdd className="ml-2 text-xl bx bx-user-plus text-[#FF3131]" />
-              </div>
-            </div>
-
-            <div className="w-full max-w-screen-sm p-5 m-auto md:p-5 lg:w-full h-fit">
-              <section className="py-8 antialiased bg-white dark:bg-gray-900 lg:py-2">
-                <div className="max-w-2xl mx-auto">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-lg font-bold text-gray-900 lg:text-2xl dark:text-white">
-                      Post Comment
-                    </h2>
-                  </div>
-                  <form className="mb-1" onSubmit={PostComment}>
-                    <div className="px-4 py-2 mb-4 bg-white border border-gray-200 rounded-lg rounded-t-lg dark:bg-gray-800 dark:border-gray-700">
-                      <label htmlFor="comment" className="sr-only">
-                        Your comment
-                      </label>
-                      <textarea
-                        id="comment"
-                        rows="2"
-                        className="w-full px-0 text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
-                        placeholder="Write a comment..."
-                        onChange={(e) => setUserComment(e.target.value)}
-                        required
-                      ></textarea>
-                    </div>
-
-                    <Button variant="gradient" type="submit">
-                      Comment
-                    </Button>
-                  </form>
-                </div>
-              </section>
-            </div>
-
-            {allComments && (
-              <div className="lg:sticky lg:top-[65px] flex flex-col gap-4 p-5 rounded-sm border shadow-sm h-auto max-h-[70vh] overflow-y-auto mx-5">
-                {allComments.map((item) => (
-                  <>
-                    <article
-                      className="p-2 text-base bg-white rounded-lg dark:bg-gray-900"
-                      key={item.id}
-                    >
-                      <footer className="flex items-center justify-between mb-2">
-                        <div className="flex items-center">
-                          <p className="inline-flex items-center mr-3 text-sm font-semibold text-gray-900 dark:text-white">
-                            <Image
-                              className="w-6 h-6 mr-2 rounded-full"
-                              src="https://flowbite.com/docs/images/people/profile-picture-2.jpg"
-                              alt="Michael Gough"
-                              width={24}
-                              height={24}
-                            />
-                            Michael Gough
-                          </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            <time
-                              pubdate
-                              dateTime="2022-02-08"
-                              title="February 8th, 2022"
-                            >
-                              Feb. 8, 2022
-                            </time>
-                          </p>
-                        </div>
-                        <button
-                          id="dropdownComment1Button"
-                          data-dropdown-toggle="dropdownComment1"
-                          className="inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 bg-white rounded-lg dark:text-gray-400 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                          type="button"
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="currentColor"
-                            viewBox="0 0 16 3"
-                          >
-                            <path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
-                          </svg>
-                          <span className="sr-only">Comment settings</span>
-                        </button>
-                        {/* Dropdown menu */}
-                        <div
-                          id="dropdownComment1"
-                          className="z-10 hidden bg-white divide-y divide-gray-100 rounded shadow w-36 dark:bg-gray-700 dark:divide-gray-600"
-                        >
-                          <ul
-                            className="py-1 text-sm text-gray-700 dark:text-gray-200"
-                            aria-labelledby="dropdownMenuIconHorizontalButton"
-                          >
-                            <li>
-                              <a
-                                href="#"
-                                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                              >
-                                Remove
-                              </a>
-                            </li>
-                            <li>
-                              <a
-                                href="#"
-                                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                              >
-                                Report
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </footer>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {item.usercomment}
-                      </p>
-                    </article>
-                  </>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       )}

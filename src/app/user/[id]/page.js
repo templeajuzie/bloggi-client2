@@ -15,6 +15,8 @@ import DynamicFeedIcon from "@mui/icons-material/DynamicFeed";
 import Link from "next/link";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import io from "socket.io-client";
+import { setUser } from "@/app/redux/slice/userauthSlice";
+import { FaHandsClapping } from "react-icons/fa6";
 
 const UserProfile = () => {
   const user = useSelector((state) => state.userauth.user);
@@ -25,6 +27,9 @@ const UserProfile = () => {
   const [blognav, setBlogNav] = useState(false);
   const [userdata, setUserData] = useState(null);
   const [userpost, setUserPost] = useState(null);
+  const [follower, setFollower] = useState(null);
+  const [following, setFollowing] = useState(null);
+
   const socket = io.connect(`${process.env.NEXT_PUBLIC_SERVER_URL}`);
 
   const loading = useSelector((state) => state.userauth.loading);
@@ -37,6 +42,18 @@ const UserProfile = () => {
   const [size, setSize] = useState(null);
 
   const handleOpen = (value) => setSize(value);
+
+  useEffect(() => {
+    socket.on("profileconnect", ({ userData, profileData }) => {
+      setUserData(profileData);
+      dispatch();
+      console.log("new data: ", data);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
 
   useEffect(() => {
     dispatch({ type: "userauth/getUserInformation" });
@@ -55,29 +72,13 @@ const UserProfile = () => {
           setUserData(userdetails);
           setUserPost(postdata);
 
-          console.log("this is", userdetails, postdata);
+          console.log("this is", postdata);
         }
       } catch (error) {}
     };
 
     fetchData();
-
-    if (!socketRef.current) {
-    }
-
-    // Clean up socket on component unmount
   }, []);
-
-  useEffect(() => {
-    socket.on("profileconnect", (data) => {
-      setLike(data);
-      console.log(data);
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [socket]);
 
   const PostNav = () => {
     setBlogNav(!blognav);
@@ -127,22 +128,22 @@ const UserProfile = () => {
               </div>
             </div>
           ) : (
-            <>
-              <div className="flex flex-col items-center justify-center gap-5 md:flex-col lg:flex-row ">
-                <div className="object-center p-1 bg-transparent bg-white rounded-full lg:ml-20">
+            <div className="flex flex-col w-screen gap-5 md:px-[50px]">
+              <div className="flex flex-col items-center justify-center w-full gap-5 md:justify-start md:flex-row lg:flex-row">
+                <div className="object-center bg-transparent w-fit h-full">
                   <Image
                     alt="Profile Picture"
                     src={userdata.userdp}
-                    className="object-cover rounded-full w-36 h-36"
+                    className="h-[160px] w-[160px] object-cover rounded-full border-4 border-white dark:border-gray-800 mx-auto my-4"
                     width={500}
                     height={500}
                   />
                 </div>
 
-                <div className="flex flex-col items-center justify-center col-span-4 gap-4 lg:justify-start lg:items-start">
-                  <div className="flex flex-col items-center gap-5 text-gray-800 md:flex-row md:items-end lg:item-center lg:items-end">
-                    <div className="flex flex-col items-center gap-2 a lg:items-start">
-                      <div className="font-medium">{userdata.username}</div>
+                <div className="flex flex-col items-center justify-center col-span-4 gap-4 md:justify-start md:items-start w-[70%]">
+                  <div className="flex flex-col items-center gap-5 text-gray-800 md:flex-row md:items-end">
+                    <div className="flex flex-col items-center gap-2 a md:items-start">
+                      <div className="font-medium">@{userdata.username}</div>
 
                       <div className="text-2xl">{userdata.fullname}</div>
                     </div>
@@ -155,7 +156,7 @@ const UserProfile = () => {
                               className="px-6 py-2 text-gray-100 bg-[#FF3131] flex w-fit items-center justify-center rounded"
                               onClick={userConnect}
                             >
-                              {user.following.includes(String(userdata._id))
+                              {userdata.followers.includes(String(user._id))
                                 ? "Following"
                                 : "Follow"}
                               <AiOutlineUserAdd className="ml-2 bx bx-user-plus" />
@@ -199,7 +200,7 @@ const UserProfile = () => {
                   </div>
 
                   <div className="flex flex-row items-center gap-10 text-gray-800">
-                    <div>
+                    <div className="flex flex-row gap-2">
                       <span className="font-semibold">
                         {" "}
                         {userdata.mypost.length}{" "}
@@ -207,7 +208,7 @@ const UserProfile = () => {
                       Posts
                     </div>
 
-                    <div>
+                    <div className="flex flex-row gap-2">
                       <span className="font-semibold">
                         {" "}
                         {userdata.followers.length}{" "}
@@ -215,7 +216,7 @@ const UserProfile = () => {
                       Followers
                     </div>
 
-                    <div>
+                    <div className="flex flex-row gap-2">
                       <span className="font-semibold">
                         {" "}
                         {userdata.following.length}{" "}
@@ -224,16 +225,16 @@ const UserProfile = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-col items-center justify-center text-gray-800 lg:justify-start lg:items-start">
-                    <p className="w-[80%] md:w-[70%] text-center lg:text-start">
+                  <div className="flex flex-col items-center justify-center text-gray-800 md:justify-start w-full md:items-start md:w-[95%] lg:w-[80%]">
+                    <p className="text-center md:text-start flex flex-wrap w-full">
                       {userdata.userbio}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <hr className="border-gray-800" />
-            </>
+              <hr className="border-gray-300" />
+            </div>
           )}
         </div>
 
@@ -330,21 +331,8 @@ const UserProfile = () => {
                                 <span>{post.comment.length}</span>
                               </div>
 
-                              <div className="flex flex-row items-center text-xs font-medium text-gray-500">
-                                <svg
-                                  className="w-4 h-4 mr-1"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
-                                  ></path>
-                                </svg>
+                              <div className="flex flex-row items-center text-xs font-medium text-gray-500 cursor-pointer">
+                                <FaHandsClapping />
                                 <span>{post.like.length}</span>
                               </div>
                             </div>

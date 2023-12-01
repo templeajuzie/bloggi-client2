@@ -16,7 +16,7 @@ const Dasboard = () => {
     <div>
       <header className="h-[50vh] overflow-hidden">
         <div className="absolute">
-          <div className="absolute bg-black opacity-[45%] w-full h-[45vh]"></div>
+          <div className="absolute bg-black opacity-[70%] w-full h-[45vh]"></div>
           <Image
             src="/headerbg.png"
             alt="background image"
@@ -167,18 +167,27 @@ const Dasboard = () => {
             </div>
           </div>
 
-          <div className="mt-8 text-white">
-            {user && (
+          <div className="mt-8 text-white flex flex-col gap-5">
+            {user ? (
               <h1 className="text-xl font-bold text-gray-300 sm:text-3xl">
                 Welcome Back, {user.fullname.split(" ")[0]}!
               </h1>
+            ) : (
+              <h1 className="text-xl font-bold text-gray-300 sm:text-3xl">
+                Earn, doing what you love.
+              </h1>
             )}
 
-            <p className="mt-1.5 text-sm text-gray-100 ">
-              Your post has seen a 52% increase in traffic in the last month.
-              Keep it up! 🚀
-            </p>
-            
+            {user ? (
+              <p className="mt-1.5 text-sm text-gray-100 ">
+                Your post has seen a 52% increase in traffic in the last month.
+                Keep it up! 🚀
+              </p>
+            ) : (
+              <p className="mt-1.5 text-sm text-gray-100 lg:w-[47%]">
+                Bloggi offers the most flexible platform for both writers. Now you can post across multiple platform with just one button🚀
+              </p>
+            )}
           </div>
         </div>
       </header>

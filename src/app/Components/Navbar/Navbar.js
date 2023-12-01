@@ -110,13 +110,13 @@ const Navbar = () => {
   };
 
   return (
-    <section className="top-0 relative sticky z-30 ">
+    <section className="relative sticky top-0 z-30 ">
       <header className="bg-white shadow-lg">
-        <div className="  px-4">
-          <div className="flex h-16 items-center justify-between">
+        <div className="px-4 ">
+          <div className="flex items-center justify-between h-16">
             <div className=" md:flex md:items-center md:gap-12">
               <Link
-                className="text-teal-600 flex flex-row items-center gap-2"
+                className="flex flex-row items-center gap-2 text-teal-600"
                 href="/"
               >
                 <Image
@@ -131,6 +131,7 @@ const Navbar = () => {
 
             <div className="hidden md:block">
               <nav aria-label="Global">
+                
                 <ul className="flex items-center gap-6 text-sm">
                   <li>
                     <Link
@@ -144,10 +145,10 @@ const Navbar = () => {
                   <li>
                     <Link
                       href="/"
-                      className="text-gray-500 transition hover:text-gray-500/75 flex gap-2 items-center"
+                      className="flex items-center gap-2 text-gray-500 transition hover:text-gray-500/75"
                     >
                       Premium
-                      <PiCrownBold className="text-yellow-400 text-base" />
+                      <PiCrownBold className="text-base text-yellow-400" />
                     </Link>
                   </li>
 
@@ -182,7 +183,7 @@ const Navbar = () => {
             </div>
 
             <div className="flex items-center gap-4">
-              {!user && (
+              {token && !user && !loading &&  (
                 <div className="sm:flex sm:gap-4">
                   <Link
                     className="rounded-md bg-[#FF3131] px-5 py-2.5 text-sm font-medium text-white shadow"
@@ -202,6 +203,8 @@ const Navbar = () => {
                 </div>
               )}
 
+              {!token && loading && !user &&  <CircularProgress/>}
+
               {user && (
                 <div className="flex flex-row items-center gap-5">
                   <div className="sm:flex sm:gap-4">
@@ -214,11 +217,11 @@ const Navbar = () => {
                   </div>
                   <button
                     type="button"
-                    className="group flex shrink-0 items-center rounded-lg transition"
+                    className="flex items-center transition rounded-lg group shrink-0"
                   >
                     {user && (
-                      <>
-                        <span className="sr-only">Menu</span>
+                      <div className="flex flex-row items-center">
+                     
                         <Link href={`/user/${user._id}`}>
                           <Image
                             alt="Man"
@@ -233,7 +236,7 @@ const Navbar = () => {
                           <MenuHandler>
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
-                              className="ms-2 hidden h-5 w-5 text-gray-500 transition group-hover:text-gray-700 sm:block"
+                              className="hidden w-5 h-5 text-gray-500 transition ms-2 group-hover:text-gray-700 sm:block"
                               viewBox="0 0 20 20"
                               fill="currentColor"
                             >
@@ -247,7 +250,7 @@ const Navbar = () => {
                           <MenuList className="mt-5">
                             <Link
                               href={`/user/${user._id}`}
-                              className="block px-4 underline-none  py-3 text-sm text-gray-600 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-100"
+                              className="block px-4 py-3 text-sm text-gray-600 transition-colors duration-200 underline-none hover:bg-gray-100 dark:hover:bg-gray-100"
                             >
                               View profile
                             </Link>
@@ -273,7 +276,7 @@ const Navbar = () => {
 
                             <p
                               onClick={SignOutAccount}
-                              className="block cursor-pointer px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-100"
+                              className="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-200 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-100"
                             >
                               Sign Out
                             </p>
@@ -281,14 +284,14 @@ const Navbar = () => {
                             {/* <hr className='border-gray-200' />
 
                             <Button
-                              className='block px-4 py-2 mt-2 mx-2 text-sm text-gray-600 bg-transparent capitalize transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-100'
+                              className='block px-4 py-2 mx-2 mt-2 text-sm text-gray-600 capitalize transition-colors duration-200 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-100'
                               onClick={DeleteAccount}
                             >
                               Delete Account
                             </Button> */}
                           </MenuList>
                         </Menu>
-                      </>
+                      </div>
                     )}
                   </button>
                 </div>
