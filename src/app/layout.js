@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
       </Head>
       <Provider store={store}>
-        <Offline />
+       
         {children}
       </Provider>
     </>
