@@ -1,25 +1,26 @@
-import Head from 'next/head';
-import { Inter } from "next/font/google";
-import './globals.css';
-import { store } from './redux/store/store';
-import { Provider } from 'react-redux';
-import Offline from './Components/Announcement/Offline';
+'use client'; // This is a client component 👈🏽
 
-export const metadata = {
-  title: 'Bloggi: Your Gateway to Creative Expression',
-  description: 'Unleash your thoughts and stories on Bloggi, the platform designed for seamless writing experiences. Crafted with precision and powered by create next app.',
+import './globals.css';
+import { Inter } from 'next/font/google';
+import ReduxProvider from './redux/Provider/ReduxProvider';
+
+
+const inter = Inter({ subsets: ['latin'] });
+
+const metadata = {
+  title: "Bloggi: Your Gateway to Creative Expression",
+  description: "Unleash your thoughts and stories on Bloggi, the platform designed for seamless writing experiences. Crafted with precision and powered by create next app.",
 };
 
 export default function RootLayout({ children }) {
+  
+  
+
   return (
-    <>
-      <Head>
-        <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
-      </Head>
-      <Provider store={store}>
-       
-        {children}
-      </Provider>
-    </>
+    <html lang='en'>
+      <body className={inter.className}>
+        <ReduxProvider>{children}</ReduxProvider>
+      </body>
+    </html>
   );
 }
