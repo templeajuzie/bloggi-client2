@@ -4,16 +4,12 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Cookies from "js-cookie";
 import axios from "axios";
-// import { useRouter } from 'next/router';
-import Announcement from "../Components/Announcement/Announcement";
 import Navbar from "../Components/Navbar/Navbar";
 import Footer from "../Components/Footer/Footer";
-import { AiOutlineUserAdd } from "react-icons/ai";
 import parse from "html-react-parser";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import Swal from "sweetalert2";
 import Tooltip from "@mui/material/Tooltip";
-import Speech from "react-speech";
 
 import { TbEdit } from "react-icons/tb";
 import {
@@ -31,15 +27,12 @@ import { useRef } from "react";
 import io from "socket.io-client";
 import { FaHandsClapping } from "react-icons/fa6";
 import PostChat from "../Components/Modal/PostChat";
-// import PostComment from "@/app/Components/Modal/PostComment";
 
 const BlogPost = () => {
   const params = useParams();
   const router = useRouter();
   const token = Cookies.get("authtoken");
   const socketRef = useRef(null);
-
-  let speak = new SpeechSynthesisUtterance();
 
   const socket = io.connect(`${process.env.NEXT_PUBLIC_SERVER_URL}`);
 
@@ -219,7 +212,7 @@ const BlogPost = () => {
           <div className="items-center justify-center w-full md:w-[80%] lg:w-[70%] lg:px-10">
             <main className="relative flex flex-col gap-4 p-5 shadow-md md:p-5 lg:p-10">
               <div className="flex flex-col w-full gap-4 mx-auto ab md:mb-0">
-                <div className="flex flex-row items-center justify-between">
+                <div className="flex flex-col items-start justify-between md:items-center md:flex-row">
                   <div className="flex py-2 ">
                     <Image
                       src={blog.author.userdp}
@@ -243,7 +236,7 @@ const BlogPost = () => {
                         {blog.author.fullname}
                       </p>
                       <p
-                        className="text-xs font-semibold text-black cursor-pointer"
+                        className="text-xs text-black cursor-pointer"
                         onClick={() => {
                           let id = blog.author._id;
                           viewProfile(id);
@@ -254,13 +247,18 @@ const BlogPost = () => {
                     </div>
                   </div>
 
-                  <Link
-                    href={`/category/${blog.category}`}
-                    className="inline-flex items-center justify-center px-4 my-2 mb-2 text-sm text-gray-800"
-                  >
-                    Post Category: 
-                    <span className="font-bold ml-1"> {blog.category}</span>
-                  </Link>
+                  <div className="inline-flex items-center justify-center">
+                    
+                    <span className="text-sm text-gray-800">
+                      Post Category:
+                    </span>
+                    <Link
+                      href={`/category/${blog.category}`}
+                      className="px-1 my-2 mb-2 text-sm font-bold text-gray-800"
+                    >
+                      {blog.category}
+                    </Link>
+                  </div>
                 </div>
                 {/* <div className="bg-red-500">
                   <Speech

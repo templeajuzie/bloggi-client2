@@ -50,7 +50,7 @@ const PostChat = ({
             </Tooltip>
           </div>
         </DialogHeader>
-        <DialogBody className="py-1 rounded-sm shadow-sm md:h-[60vh] lg:h-[70vh] xl:h-[60vh] overflow-y-scroll">
+        <DialogBody className="py-1 rounded-sm shadow-sm h-[80vh] md:h-[60vh] lg:h-[70vh] xl:h-[60vh] overflow-y-scroll">
           <div className="flex flex-col gap-4">
             {allComments.map((item) => (
               <article
@@ -124,7 +124,7 @@ const PostChat = ({
             ))}
           </div>
         </DialogBody>
-        <DialogFooter className="flex flex-col items-center justify-center h-auto">
+        <DialogFooter className="flex flex-col items-center justify-center h-[10vh] md:h-auto">
           <div className="flex flex-row items-center justify-between w-full gap-4">
             <div className="flex flex-row items-center w-full gap-5">
               <div className="flex flex-row items-center w-full gap-5 px-1 py-1 bg-gray-200 rounded-full cursor-pointer">

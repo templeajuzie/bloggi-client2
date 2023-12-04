@@ -135,8 +135,8 @@ function PostHome() {
                   <>
                     <article
                       key={post.id}
-                      // className='flex flex-col items-center gap-4 bg-white border border-gray-200 rounded-lg shadow-md md:flex-row lg:flex-row'>
-                      className="flex flex-col items-center w-full gap-4 px-2 mb-5 bg-white rounded-lg shadow-lg h-fit md:flex-row lg:flex-row"
+                      
+                      className="flex flex-col-reverse items-center w-full gap-4 px-2 mb-5 bg-white rounded-lg shadow-lg h-fit md:flex-row lg:flex-row"
                     >
                       <Link
                         href={`/${post._id}`}
@@ -151,7 +151,7 @@ function PostHome() {
                           draggable={false}
                         />
                       </Link>
-                      <div className="content p-6 w-full md:w-[50%] lg:w-[50%] xl:w-[50%]">
+                      <div className="content p-2 md:p-6 w-full md:w-[50%] lg:w-[50%] xl:w-[50%]">
                         <div className="flex items-center justify-between mb-5 text-gray-500">
                           {/* <span className='bg-primary-100 text-primary-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded'>
                             {post.category}
