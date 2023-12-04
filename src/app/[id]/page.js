@@ -13,6 +13,7 @@ import parse from "html-react-parser";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import Swal from "sweetalert2";
 import Tooltip from "@mui/material/Tooltip";
+import Speech from "react-speech";
 
 import { TbEdit } from "react-icons/tb";
 import {
@@ -37,6 +38,8 @@ const BlogPost = () => {
   const router = useRouter();
   const token = Cookies.get("authtoken");
   const socketRef = useRef(null);
+
+  let speak = new SpeechSynthesisUtterance();
 
   const socket = io.connect(`${process.env.NEXT_PUBLIC_SERVER_URL}`);
 
@@ -113,8 +116,10 @@ const BlogPost = () => {
           setBlog(response.data.blogdata);
 
           setAllComments(response.data.blogdata.comment);
-          setallClap(response.data.blogdata.like)
+          setallClap(response.data.blogdata.like);
           console.log(response.data.blogdata.comment);
+
+          // speak.text("Hellow how are you")
         }
 
         console.log(response.data.data);
@@ -253,9 +258,23 @@ const BlogPost = () => {
                     href={`/category/${blog.category}`}
                     className="inline-flex items-center justify-center px-4 my-2 mb-2 text-sm text-gray-800"
                   >
-                    #{blog.category}
+                    Post Category: 
+                    <span className="font-bold ml-1"> {blog.category}</span>
                   </Link>
                 </div>
+                {/* <div className="bg-red-500">
+                  <Speech
+                    text="I have all properties set to their default"
+                    pitch="1"
+                    rate="1"
+                    volume="50"
+                    lang="en-GB"
+                    voice="Google UK English Male"
+                    stop={true}
+                    pause={true}
+                    resume={true}
+                  />
+                </div> */}
 
                 <div className="md:px-4 lg:px-0">
                   <h2 className="text-xl font-semibold leading-tight text-gray-800">
@@ -369,29 +388,29 @@ const BlogPost = () => {
                         arrow
                       >
                         <div className="flex flex-row items-center text-xs font-medium text-gray-500 cursor-pointer">
-                        <FaHandsClapping
-                          className={
-                            user && allclap.includes(String(user._id))
-                              ? postlike
-                              : postunlike
-                          }
-                          onClick={() => {
-                            let id = blog._id;
-                            if (user) {
-                              PostReaction(id);
-                            } else {
-                              Swal.fire({
-                                title: "You need to Sign In",
-                                text: "Before you can like a post",
-                                icon: "warning",
-                              });
-                              router.push("/signin");
+                          <FaHandsClapping
+                            className={
+                              user && allclap.includes(String(user._id))
+                                ? postlike
+                                : postunlike
                             }
-                          }}
-                        />
+                            onClick={() => {
+                              let id = blog._id;
+                              if (user) {
+                                PostReaction(id);
+                              } else {
+                                Swal.fire({
+                                  title: "You need to Sign In",
+                                  text: "Before you can like a post",
+                                  icon: "warning",
+                                });
+                                router.push("/signin");
+                              }
+                            }}
+                          />
 
-                        <span>{allclap.length}</span>
-                      </div>
+                          <span>{allclap.length}</span>
+                        </div>
                       </Tooltip>
                     </div>
                   </div>

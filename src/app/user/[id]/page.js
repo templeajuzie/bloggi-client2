@@ -130,7 +130,7 @@ const UserProfile = () => {
           ) : (
             <div className="flex flex-col w-screen gap-5 md:px-[50px]">
               <div className="flex flex-col items-center justify-center w-full gap-5 md:justify-start md:flex-row lg:flex-row">
-                <div className="object-center bg-transparent w-fit h-full">
+                <div className="relative object-center h-full bg-transparent w-fit">
                   <Image
                     alt="Profile Picture"
                     src={userdata.userdp}
@@ -138,6 +138,8 @@ const UserProfile = () => {
                     width={500}
                     height={500}
                   />
+
+                  <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
                 </div>
 
                 <div className="flex flex-col items-center justify-center col-span-4 gap-4 md:justify-start md:items-start w-[70%]">
@@ -226,7 +228,7 @@ const UserProfile = () => {
                   </div>
 
                   <div className="flex flex-col items-center justify-center text-gray-800 md:justify-start w-full md:items-start md:w-[95%] lg:w-[80%]">
-                    <p className="text-center md:text-start flex flex-wrap w-full">
+                    <p className="flex flex-wrap w-full text-center md:text-start">
                       {userdata.userbio}
                     </p>
                   </div>
