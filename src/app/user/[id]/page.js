@@ -130,19 +130,30 @@ const UserProfile = () => {
           ) : (
             <div className="flex flex-col w-screen gap-5 md:px-[50px]">
               <div className="flex flex-col items-center justify-center w-full gap-5 md:justify-start md:flex-row lg:flex-row">
-                <div className="relative object-center h-full bg-transparent w-fit">
+                {/* <div className="relative object-center h-full bg-transparent w-fit">
                   <Image
                     alt="Profile Picture"
                     src={userdata.userdp}
-                    className="h-[160px] w-[160px] object-cover rounded-full border-4 border-white dark:border-gray-800 mx-auto my-4"
+                    className="h-[160px] w-[160px] object-cover rounded-full border-4 border-white dark:border-gray-800"
                     width={500}
                     height={500}
                   />
 
-                  <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                  <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-white rounded-full border-3"></div>
+                </div> */}
+
+                <div className="relative">
+                  <Image
+                    className="h-[160px] w-[160px] object-cover rounded-full border-4 border-white"
+                    src={userdata.userdp}
+                    width={500}
+                    height={500}
+                    alt=""
+                  />
+                  <span className="absolute w-4 h-4 bg-green-400 border-2 border-white rounded-full bottom-2 right-7 dark:border-gray-800"></span>
                 </div>
 
-                <div className="flex flex-col items-center justify-center col-span-4 gap-4 md:justify-start md:items-start w-[70%]">
+                <div className="flex flex-col items-center justify-center col-span-4 gap-4 md:justify-start lg:ml-10 md:items-start w-[70%]">
                   <div className="flex flex-col items-center gap-5 text-gray-800 md:flex-row md:items-end">
                     <div className="flex flex-col items-center gap-2 a md:items-start">
                       <div className="font-medium">@{userdata.username}</div>
