@@ -49,25 +49,29 @@ function EditBlog() {
     const FetchData = async () => {
 
       try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/blog/edit/${params.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${String(token)}`,
-            },
+        if (typeof window !== 'undefined') {
+
+
+          const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/blog/edit/${params.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${String(token)}`,
+              },
+            }
+          )
+  
+          if (response.status === 200) {
+            const data = response.data.oldblog;
+  
+            setLoading(false)
+  
+            setTitle(data.title)
+            setShortDescription(data.shortdescription)
+            setLongDescription(data.longdescription)
+            setCategory(data.category)
+            setSelectedPhoto(data.blogimage)
           }
-        )
-
-        if (response.status === 200) {
-          const data = response.data.oldblog;
-
-          setLoading(false)
-
-          setTitle(data.title)
-          setShortDescription(data.shortdescription)
-          setLongDescription(data.longdescription)
-          setCategory(data.category)
-          setSelectedPhoto(data.blogimage)
         }
 
 

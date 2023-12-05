@@ -240,13 +240,13 @@ function CreateBlog() {
               >
                 Post Content
               </label>
-              {/* <ReactQuill
+              <ReactQuill
                 theme="snow"
                 className="w-full h-full text-sm rounded-lg"
                 value={longdescription}
                 onChange={handleChange}
                 required
-              /> */}
+              />
             </div>
             <ReactiveButton
               buttonState={state}
