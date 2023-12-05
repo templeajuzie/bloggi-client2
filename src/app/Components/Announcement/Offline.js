@@ -7,7 +7,9 @@ const Offline = () => {
   // console.log('loading offline');
 
   const reFresh = () => {
-    window.location.reload();
+    if (typeof window !== "undefined") {
+      window.location.reload();
+    }
   };
 
   return (

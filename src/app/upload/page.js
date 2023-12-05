@@ -25,9 +25,9 @@ function CreateBlog() {
   const authToken = useSelector((state) => state.authslice.authToken);
 
   var currentDate = new Date();
-  var year = currentDate.getFullYear();
-  var month = currentDate.getMonth() + 1; // Note: Month is zero-based, so we add 1
-  var day = currentDate.getDate();
+  // var year = currentDate.getFullYear();
+  // var month = currentDate.getMonth() + 1; // Note: Month is zero-based, so we add 1
+  // var day = currentDate.getDate();
 
   const [selectedphoto, setSelectedPhoto] = useState(null);
   const [title, setTitle] = useState(null);
@@ -52,12 +52,15 @@ function CreateBlog() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("shortdescription", shortdescription);
-    formData.append("longdescription", longdescription);
-    formData.append("category", category);
-    formData.append("blogimage", blogimage);
+    if (typeof window !== "undefined") {
+      const formData = new FormData();
+      
+      formData.append("title", title);
+      formData.append("shortdescription", shortdescription);
+      formData.append("longdescription", longdescription);
+      formData.append("category", category);
+      formData.append("blogimage", blogimage);
+    }
 
     try {
       setState("loading");

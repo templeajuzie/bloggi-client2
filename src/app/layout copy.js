@@ -27,13 +27,15 @@ export default function RootLayout({ children }) {
   useEffect(() => {
     setIsOnline(navigator.onLine);
 
-    window.addEventListener("online", () => setIsOnline(true));
-    window.addEventListener("offline", () => setIsOnline(false));
-
-    return () => {
-      window.removeEventListener("online", () => setIsOnline(true));
-      window.removeEventListener("offline", () => setIsOnline(false));
-    };
+    if (typeof window !== "undefined") {
+      window.addEventListener("online", () => setIsOnline(true));
+      window.addEventListener("offline", () => setIsOnline(false));
+      
+      return () => {
+        window.removeEventListener("online", () => setIsOnline(true));
+        window.removeEventListener("offline", () => setIsOnline(false));
+      };
+    }
   }, []);
 
   return (
