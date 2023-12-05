@@ -54,50 +54,50 @@ function CreateBlog() {
 
     if (typeof window !== "undefined") {
       const formData = new FormData();
-      
+
       formData.append("title", title);
       formData.append("shortdescription", shortdescription);
       formData.append("longdescription", longdescription);
       formData.append("category", category);
       formData.append("blogimage", blogimage);
-    }
 
-    try {
-      setState("loading");
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/blog/create`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${String(token)}`,
-            "Content-Type": "multipart/form-data",
-          },
+      try {
+        setState("loading");
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/blog/create`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${String(token)}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        if (response.status === 201) {
+          setState("error");
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+            footer: '<a href="#">Why do I have this issue?</a>',
+          });
         }
-      );
 
-      if (response.status === 201) {
-        setState("error");
+        setState("success");
+
         Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Something went wrong!",
-          footer: '<a href="#">Why do I have this issue?</a>',
+          title: "Your post is Live",
+          text: "We are incredibly proud of you for sharing your post. Your voice matters!",
+          icon: "success",
         });
+
+        router.push(`/${response.data.blogData._id}`);
+
+        console.log(post.data);
+      } catch (error) {
+        console.log(error);
       }
-
-      setState("success");
-
-      Swal.fire({
-        title: "Your post is Live",
-        text: "We are incredibly proud of you for sharing your post. Your voice matters!",
-        icon: "success",
-      });
-
-      router.push(`/${response.data.blogData._id}`);
-
-      console.log(post.data);
-    } catch (error) {
-      console.log(error);
     }
   };
 
@@ -240,13 +240,13 @@ function CreateBlog() {
               >
                 Post Content
               </label>
-              <ReactQuill
+              {/* <ReactQuill
                 theme="snow"
                 className="w-full h-full text-sm rounded-lg"
                 value={longdescription}
                 onChange={handleChange}
                 required
-              />
+              /> */}
             </div>
             <ReactiveButton
               buttonState={state}
