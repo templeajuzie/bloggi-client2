@@ -1,4 +1,4 @@
-"use client"; // This is a client component 👈🏽
+"use client";
 
 import axios from "axios";
 import { useState, useEffect } from "react";
