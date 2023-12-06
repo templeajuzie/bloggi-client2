@@ -1,5 +1,4 @@
 'use client'; // This is a client component 👈🏽
-
 import './globals.css';
 import { Inter } from 'next/font/google';
 import ReduxProvider from './redux/Provider/ReduxProvider';
