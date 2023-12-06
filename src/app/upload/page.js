@@ -25,9 +25,9 @@ function CreateBlog() {
   const authToken = useSelector((state) => state.authslice.authToken);
 
   var currentDate = new Date();
-  // var year = currentDate.getFullYear();
-  // var month = currentDate.getMonth() + 1; // Note: Month is zero-based, so we add 1
-  // var day = currentDate.getDate();
+  var year = currentDate.getFullYear();
+  var month = currentDate.getMonth() + 1; // Note: Month is zero-based, so we add 1
+  var day = currentDate.getDate();
 
   const [selectedphoto, setSelectedPhoto] = useState(null);
   const [title, setTitle] = useState(null);
@@ -43,61 +43,58 @@ function CreateBlog() {
   const handleImageChange = (e) => {
     const selectedFile = e.target.files[0];
     setBlogImage(selectedFile);
-    if (typeof window !== "undefined") {
-      const imageUrl = URL.createObjectURL(selectedFile);
-      setSelectedPhoto(imageUrl);
-    }
+    // if (typeof window !== "undefined") {
+    // }
+    const imageUrl = URL.createObjectURL(selectedFile);
+    setSelectedPhoto(imageUrl);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (typeof window !== "undefined") {
-      const formData = new FormData();
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("shortdescription", shortdescription);
+    formData.append("longdescription", longdescription);
+    formData.append("category", category);
+    formData.append("blogimage", blogimage);
 
-      formData.append("title", title);
-      formData.append("shortdescription", shortdescription);
-      formData.append("longdescription", longdescription);
-      formData.append("category", category);
-      formData.append("blogimage", blogimage);
-
-      try {
-        setState("loading");
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/blog/create`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${String(token)}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-
-        if (response.status === 201) {
-          setState("error");
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Something went wrong!",
-            footer: '<a href="#">Why do I have this issue?</a>',
-          });
+    try {
+      setState("loading");
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/v1/blog/create`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${String(token)}`,
+            "Content-Type": "multipart/form-data",
+          },
         }
+      );
 
-        setState("success");
-
+      if (response.status === 201) {
+        setState("error");
         Swal.fire({
-          title: "Your post is Live",
-          text: "We are incredibly proud of you for sharing your post. Your voice matters!",
-          icon: "success",
+          icon: "error",
+          title: "Oops...",
+          text: "Something went wrong!",
+          footer: '<a href="#">Why do I have this issue?</a>',
         });
-
-        router.push(`/${response.data.blogData._id}`);
-
-        console.log(post.data);
-      } catch (error) {
-        console.log(error);
       }
+
+      setState("success");
+
+      Swal.fire({
+        title: "Your post is Live",
+        text: "We are incredibly proud of you for sharing your post. Your voice matters!",
+        icon: "success",
+      });
+
+      router.push(`/${response.data.blogData._id}`);
+
+      console.log(post.data);
+    } catch (error) {
+      console.log(error);
     }
   };
 

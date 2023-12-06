@@ -271,7 +271,7 @@ function PostHome() {
                                       : postunlike
                                   }
                                   onClick={() => {
-                                    if (typeof window !== 'undefined') {
+                                    
                                     if (user) {
                                       router.push(`/${post._id}`);
                                     } else {
@@ -282,7 +282,6 @@ function PostHome() {
                                       });
                                       router.push("/signin");
                                     }
-                                  }
                                   }}
                                 />
 

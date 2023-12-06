@@ -61,9 +61,7 @@ const Navbar = () => {
       }
 
       Cookies.remove("authtoken");
-      if (typeof window !== "undefined") {
-        window.location.reload();
-      }
+      window.location.reload();
     } catch (error) {}
   };
 
@@ -99,9 +97,7 @@ const Navbar = () => {
           }
 
           Cookies.remove("authtoken");
-          if (typeof window !== "undefined") {
-            window.location.reload();
-          }
+          window.location.reload();
 
           Swal.fire({
             title: "We hate to see you go!",

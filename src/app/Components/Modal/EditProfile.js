@@ -76,9 +76,7 @@ const EditProfile = ({ size, handleOpen }) => {
         text: "Your profile has been updated successfully.",
         icon: "success",
       });
-      if (typeof window !== "undefined") {
-        window.location.reload();
-      }
+      window.location.reload();
       handleOpen(null)
     } catch (error) {
      }

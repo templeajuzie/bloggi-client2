@@ -393,7 +393,6 @@ const BlogPost = () => {
                                 : postunlike
                             }
                             onClick={() => {
-                              if (typeof window !== 'undefined') {
                               let id = blog._id;
                               if (user) {
                                 PostReaction(id);
@@ -405,7 +404,6 @@ const BlogPost = () => {
                                 });
                                 router.push("/signin");
                               }
-                            }
                             }}
                           />
 
