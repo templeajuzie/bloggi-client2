@@ -1,3 +1,5 @@
+'use client'
+
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import authSlice from '../slice/authSlice';
 import createSagaMiddleware from 'redux-saga';

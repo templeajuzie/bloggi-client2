@@ -1,4 +1,4 @@
-// authSaga.js
+'use client'
 
 import { takeLatest, call, put } from 'redux-saga/effects';
 import { setUser, setLoading, setError } from '../slice/userauthSlice';

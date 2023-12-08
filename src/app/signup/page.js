@@ -1,4 +1,4 @@
-"use client"; // This is a client component 👈🏽
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -74,9 +74,9 @@ function SignUp() {
   return (
     <div>
       <Navbar />
-      <section className="bg-gray-200 mx-auto px-2 py-16 sm:px-6">
+      <section className="px-2 py-16 mx-auto bg-gray-200 sm:px-6">
         <div className="flex flex-col items-center justify-center py-8 mx-auto md:h-fit lg:py-0">
-          <div className="w-full bg-white rounded-lg md:mt-0 sm:max-w-md xl:p-0 shadow-lg dark:border-gray-700">
+          <div className="w-full bg-white rounded-lg shadow-lg md:mt-0 sm:max-w-md xl:p-0 dark:border-gray-700">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <div className="a flex flex-row items-center gap-4 mb-[30px]">
                 <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-black">
@@ -97,7 +97,7 @@ function SignUp() {
                   </label>
                   <input
                     type="text"
-                    className="w-full rounded-lg border border-gray-300 p-4 pe-12 text-sm shadow-sm"
+                    className="w-full p-4 text-sm border border-gray-300 rounded-lg shadow-sm pe-12"
                     placeholder="John Doe"
                     value={fullname}
                     onChange={(e) => setFullname(e.target.value)}
@@ -113,7 +113,7 @@ function SignUp() {
                   </label>
                   <input
                     type="text"
-                    className="w-full rounded-lg border border-gray-300 p-4 pe-12 text-sm shadow-sm"
+                    className="w-full p-4 text-sm border border-gray-300 rounded-lg shadow-sm pe-12"
                     placeholder="jonnydoexx"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
@@ -131,7 +131,7 @@ function SignUp() {
                     type="email"
                     name="email"
                     id="email"
-                    className="w-full rounded-lg border border-gray-300 p-4 pe-12 text-sm shadow-sm"
+                    className="w-full p-4 text-sm border border-gray-300 rounded-lg shadow-sm pe-12"
                     placeholder="johndoe@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -150,7 +150,7 @@ function SignUp() {
                     name="password"
                     id="password"
                     placeholder="••••••••"
-                    className="w-full rounded-lg border border-gray-300 p-4 pe-12 text-sm shadow-sm"
+                    className="w-full p-4 text-sm border border-gray-300 rounded-lg shadow-sm pe-12"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required={true}

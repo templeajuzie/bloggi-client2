@@ -1,4 +1,4 @@
-'use client'; // This is a client component 👈🏽
+'use client'; 
 
 import axios from 'axios';
 import { useState, useEffect } from 'react';
@@ -139,20 +139,20 @@ function EditBlog() {
   return (
     <div>
       <Navbar />
-      <div className='mx-auto bg-gray-50 px-4 py-16 sm:px-6'>
+      <div className='px-4 py-16 mx-auto bg-gray-50 sm:px-6'>
         <div className='max-w-lg mx-auto'>
-          <h1 className='text-center text-2xl font-bold text-black sm:text-3xl'>
+          <h1 className='text-2xl font-bold text-center text-black sm:text-3xl'>
             Edit your post
           </h1>
 
-          <p className='text-center text-gray-700 text-sm mt-5 font-medium'>
+          <p className='mt-5 text-sm font-medium text-center text-gray-700'>
             Tweak, your blog, your audience are waiting...
           </p>
 
           {loading === true ? (<>
             loading...</>) : (<>
               <form
-                className='mb-6 mt-6 space-y-4 rounded-lg py-6 px-2 md:p-6 shadow-lg sm:p-8 lg:p-8'
+                className='px-2 py-6 mt-6 mb-6 space-y-4 rounded-lg shadow-lg md:p-6 sm:p-8 lg:p-8'
                 onSubmit={handleSubmit}
                 encType="multipart/form-data"
               >
@@ -163,7 +163,7 @@ function EditBlog() {
                   <input
                     type='text'
                     value={title}
-                    className='w-full rounded-lg border border-gray-300 p-4 text-sm shadow-sm'
+                    className='w-full p-4 text-sm border border-gray-300 rounded-lg shadow-sm'
                     placeholder='Blog Title'
                     onChange={(e) => setTitle(e.target.value)}
                     min={74}
@@ -176,18 +176,18 @@ function EditBlog() {
                   <input
                     type='text'
                     value={shortdescription}
-                    className='w-full rounded-lg border border-gray-300 p-4 text-sm shadow-sm'
+                    className='w-full p-4 text-sm border border-gray-300 rounded-lg shadow-sm'
                     min={92}
                     placeholder='Short Description'
                     onChange={(e) => setShortDescription(e.target.value)}
                   />
                 </div>
                 <div className='w-full'>
-                  <fieldset className='border border-gray-300 rounded-lg w-full'>
+                  <fieldset className='w-full border border-gray-300 rounded-lg'>
                     <select
                       name='blog-category'
                       value={category}
-                      className='block w-full rounded-md border-gray-300 shadow-sm py-4 px-3 text-sm text-gray-700'
+                      className='block w-full px-3 py-4 text-sm text-gray-700 border-gray-300 rounded-md shadow-sm'
                       onChange={(e) => setCategory(e.target.value)}
                     >
                       <option value='uncategorized'>Uncategorized</option>
@@ -222,9 +222,9 @@ function EditBlog() {
                   </fieldset>
                 </div>
 
-                <div className="mx-auto w-full">
-                  <label for="example1" className="mb-1 block text-sm font-medium text-gray-700">Update post image</label>
-                  <input id="example1" name="blogimage" onChange={handleImageChange} type="file" className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-black file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-60" accept='image/*' />
+                <div className="w-full mx-auto">
+                  <label for="example1" className="block mb-1 text-sm font-medium text-gray-700">Update post image</label>
+                  <input id="example1" name="blogimage" onChange={handleImageChange} type="file" className="block w-full mt-2 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-black file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-60" accept='image/*' />
                 </div>
 
 
@@ -241,7 +241,7 @@ function EditBlog() {
                   </label>
                   <ReactQuill
                     theme="snow"
-                    className='w-full rounded-lg text-sm h-full'
+                    className='w-full h-full text-sm rounded-lg'
                     value={longdescription}
                     onChange={handleChange}
                   />
