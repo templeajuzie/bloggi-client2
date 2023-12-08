@@ -43,8 +43,7 @@ function CreateBlog() {
   const handleImageChange = (e) => {
     const selectedFile = e.target.files[0];
     setBlogImage(selectedFile);
-    // if (typeof window !== "undefined") {
-    // }
+
     const imageUrl = URL.createObjectURL(selectedFile);
     setSelectedPhoto(imageUrl);
   };
