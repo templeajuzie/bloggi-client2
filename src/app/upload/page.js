@@ -1,8 +1,8 @@
 "use client";
 
 import axios from "axios";
-import { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useState } from "react";
+import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import Navbar from "../Components/Navbar/Navbar";
@@ -23,11 +23,6 @@ function CreateBlog() {
 
   const [state, setState] = useState("idle");
   const authToken = useSelector((state) => state.authslice.authToken);
-
-  var currentDate = new Date();
-  var year = currentDate.getFullYear();
-  var month = currentDate.getMonth() + 1; // Note: Month is zero-based, so we add 1
-  var day = currentDate.getDate();
 
   const [selectedphoto, setSelectedPhoto] = useState(null);
   const [title, setTitle] = useState(null);
@@ -184,20 +179,6 @@ function CreateBlog() {
                 </select>
               </fieldset>
             </div>
-            {/* <div>
-              <label htmlFor='file_input' className='block mb-2 text-sm font-medium text-gray-900'>
-                Upload file
-              </label>
-              <input
-                className='block w-full text-sm text-gray-900 placeholder-gray-400 bg-gray-100 border border-gray-200 rounded-lg shadow-md cursor-pointer focus:outline-none'
-                aria-describedby='file_input_help'
-                id='file_input'
-                type='file'
-              />
-              <p className='mt-1 text-xs text-gray-700' id='file_input_help'>
-                SVG, PNG, JPG, or GIF (Max. 800x400px).
-              </p>
-            </div> */}
 
             <div className="w-full mx-auto">
               <label
@@ -215,6 +196,9 @@ function CreateBlog() {
                 className="block w-full mt-2 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-black file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-60"
                 accept="image/*"
               />
+              {/* <p className='mt-1 text-xs text-gray-700' id='file_input_help'>
+                SVG, PNG, JPG, or GIF (Max. 800x400px).
+              </p> */}
             </div>
 
             {selectedphoto && (
@@ -236,13 +220,15 @@ function CreateBlog() {
               >
                 Post Content
               </label>
-              <ReactQuill
-                theme="snow"
-                className="w-full h-full text-sm rounded-lg"
-                value={longdescription}
-                onChange={handleChange}
-                required
-              />
+              {typeof window !== "undefined" && (
+                <ReactQuill
+                  theme="snow"
+                  className="w-full h-full text-sm rounded-lg"
+                  value={longdescription}
+                  onChange={handleChange}
+                  required
+                />
+              )}
             </div>
             <ReactiveButton
               buttonState={state}

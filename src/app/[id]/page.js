@@ -22,8 +22,7 @@ import {
 } from "@material-tailwind/react";
 
 import Link from "next/link";
-import { Diversity1Sharp } from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useRef } from "react";
 import io from "socket.io-client";
 import { FaHandsClapping } from "react-icons/fa6";
@@ -33,7 +32,6 @@ const BlogPost = () => {
   const params = useParams();
   const router = useRouter();
   const token = Cookies.get("authtoken");
-  const socketRef = useRef(null);
 
   const socket = io.connect(`${process.env.NEXT_PUBLIC_SERVER_URL}`);
 
@@ -42,7 +40,6 @@ const BlogPost = () => {
   const [allComments, setAllComments] = useState(null);
   const [allclap, setallClap] = useState(null);
   const [blognav, setBlogNav] = useState(false);
-  const isInitialRender = useRef(true);
 
   const user = useSelector((state) => state.userauth.user);
 
@@ -112,8 +109,6 @@ const BlogPost = () => {
           setAllComments(response.data.blogdata.comment);
           setallClap(response.data.blogdata.like);
           console.log(response.data.blogdata.comment);
-
-          // speak.text("Hellow how are you")
         }
 
         console.log(response.data.data);
