@@ -1,24 +1,26 @@
+'use client';
+
 import React from "react";
 
 
 function Announcement() {
   return (
     <div>
-      <div className="flex items-center justify-between gap-4 bg-teal-800 px-4 py-3 text-white">
-        <p className="text-sm flex flex-col gap-4 lg:flex-row font-medium">
+      <div className="flex items-center justify-between gap-4 px-4 py-3 text-white bg-teal-800">
+        <p className="flex flex-col gap-4 text-sm font-medium lg:flex-row">
           Welcome to Bloggy
-          <a href="#" className=" inline-block underline">
+          <a href="#" className="inline-block underline ">
             Check out this new course!
           </a>
         </p>
 
         <button
           aria-label="Dismiss"
-          className="shrink-0 rounded-lg bg-black/10 p-1 transition hover:bg-black/20"
+          className="p-1 transition rounded-lg shrink-0 bg-black/10 hover:bg-black/20"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
+            className="w-5 h-5"
             viewBox="0 0 20 20"
             fill="currentColor"
           >

@@ -1,3 +1,5 @@
+'use client';
+
 import Link from "next/link";
 import logo from "../../Resources/Images/bloggilogo.png";
 import Image from "next/image";

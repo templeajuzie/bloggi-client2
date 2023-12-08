@@ -1,3 +1,5 @@
+'use client';
+
 import Image from "next/image";
 import offline from "../../Resources/Images/offline.png";
 import logo from "../../Resources/Images/bloggilogo.png";

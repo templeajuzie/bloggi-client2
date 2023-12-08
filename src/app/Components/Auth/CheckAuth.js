@@ -1,3 +1,5 @@
+'use client';
+
 import Cookies from 'js-cookie';
 import { useSelector, useDispatch } from 'react-redux';
 import { UserSignIn, UserSignOut } from '../../redux/slice/authSlice';

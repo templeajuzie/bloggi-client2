@@ -1,4 +1,5 @@
-'use client'; // This is a client component 👈🏽
+'use client';
+
 import Image from 'next/image';
 import Dashboard from './Components/Dashboard/Dashboard';
 import PostHome from './Components/Post/PostHome';
